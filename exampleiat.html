@@ -4,7 +4,9 @@
 		<style type="text/css">
         .container {padding-top: 15px;}
 		</style>
-	
+        
+		<script src="demographics.js"></script>
+
         <script>
             // load MinnoJS from the CDN (you probably don't need to change this)
             var scriptTag                = document.createElement('script');
@@ -24,22 +26,22 @@
 
 				// Append the canvas object to the container
 				container.appendChild(canvas);
-			
 
 				// Append the container to the body
 				document.body.appendChild(container);
                 
                 // 先加载 demographics.js
-				var demoScript = document.createElement('script');
-				demoScript.src = 'demographics.js';
-				demoScript.onload = function(){
+				//var demoScript = document.createElement('script');
+				//demoScript.src = 'demographics.js';
+				//demoScript.onload = function(){
    				 // demographics 加载完后再启动 mgr
- 				minnoJS(canvas, 'mgr.js');
-				};
-				document.head.appendChild(demoScript);
+					
+ 				//minnoJS(canvas, 'mgr.js');
+				//};
+				//document.head.appendChild(demoScript);
 
 				// Run your study (just set the correct URL)
-                //minnoJS(canvas, 'mgr.js');
+                minnoJS(canvas, 'mgr.js');
                 
                 // We need to wait a few miliseconds for Qualtrics to register the value that we entered
                 minnoJS.onEnd = function () { setTimeout(proceed, 100); }
