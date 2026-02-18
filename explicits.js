@@ -122,6 +122,14 @@ define(['questAPI'], function(Quest){
 	
     API.addSequence([
         {
+            inherit:'basicPage',
+            questions: [
+                {inherit:'age'},
+                {inherit:'gender'},
+                {inherit:'major'}
+            ]
+        },
+		{
             mixer : 'random', 
             data : [
                 {
