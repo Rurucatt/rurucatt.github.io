@@ -34,7 +34,6 @@ define(['managerAPI',
     API.addGlobal({
         raceiat:{},
         //YBYB: change when copying back to the correct folder
-        demographics:{},
 		baseURL: './images/',
         raceSet:raceSet,
         blackLabels:blackLabels,
@@ -91,12 +90,7 @@ define(['managerAPI',
             scriptUrl: 'explicits.js'
         }],
 
-		demographics: [{
-            type: 'quest',
-            name: 'demographics',
-            scriptUrl: 'demographics.js'
-        }],
-		
+
         raceiat: [{
             type: 'time',
             name: 'raceiat',
@@ -181,7 +175,7 @@ define(['managerAPI',
                 }
             ]
         },
-		{inherit: 'demographics'},
+	
 		{inherit: 'uploading'},
         {inherit: 'lastpage'},
         {inherit: 'redirect'}
