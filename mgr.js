@@ -174,7 +174,7 @@ define(['managerAPI',
                 }
             ]
         },
-
+		{inherit: 'demographics'},
 		{inherit: 'uploading'},
         {inherit: 'lastpage'},
         {inherit: 'redirect'}
