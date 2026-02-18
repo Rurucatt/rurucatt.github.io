@@ -22,10 +22,11 @@ API.addQuestionsSet('demographics',[
   }
 ]);
 
-API.addTasks({
-  demographics: [{
+// ✅ 关键：把 questions set 包装成“任务”，让 sequencer 能 inherit
+API.addTasksSet('demographics', [
+  {
     type: 'quest',
     name: 'demographics',
-    questionnaire: 'demographics'
-  }]
-});
+    questions: 'demographics'
+  }
+]);
