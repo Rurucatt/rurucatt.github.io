@@ -53,11 +53,16 @@ define(['questAPI'], function(Quest){
         inherit: 'basicSelect',
         answers: [
             {text:'1 - Strongly disagree', value:1},
-            {text:'2 - Disagree', value:2},
-            {text:'3 - Somewhat disagree', value:3},
-            {text:'4 - Neither agree nor disagree', value:4},
-            {text:'5 - Somewhat agree', value:5},
-            {text:'6 - Agree', value:6},
+            //{text:'2 - Disagree', value:2},
+            //{text:'3 - Somewhat disagree', value:3},
+            //{text:'4 - Neither agree nor disagree', value:4},
+            //{text:'5 - Somewhat agree', value:5},
+            //{text:'6 - Agree', value:6},、
+			{text:'2', value:2},
+            {text:'3', value:3},
+            {text:'4', value:4},
+            {text:'5', value:5},
+            {text:'6', value:6},
             {text:'7 - Strongly agree', value:7}
         ]
     });
