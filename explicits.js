@@ -28,7 +28,7 @@ define(['questAPI'], function(Quest){
         autoSubmit:'true',
         numericValues:'true',
         help: '<%= pagesMeta.number < 3 %>',
-        helpText: 'Tip: For quick response, click to select your answer, and then click again to submit.'
+        //helpText: 'Tip: For quick response, click to select your answer, and then click again to submit.'
     });
 
     API.addQuestionsSet('basicSelect',{
