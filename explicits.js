@@ -57,7 +57,7 @@ define(['questAPI'], function(Quest){
             {text:'3 - Slightly disagree', value:3},
             {text:'4 - Neither agree nor disagree', value:4},
             {text:'5 - Slightly agree', value:5},
-            {text:'6 - Agree', value:6},、
+            {text:'6 - Agree', value:6},
             {text:'7 - Strongly agree', value:7}
         ]
     });
