@@ -12,6 +12,10 @@ define(['questAPI'], function(Quest){
         declineText: isTouch ? 'Decline' : 'Decline to Answer', 
         autoFocus:true, 
         //progressBar:  'Page <%= pagesMeta.number %> out of 2'
+
+		API.addPagesSet('mmPage',{
+        inherit: 'basicPage',
+        autoFocus: false
     });
 	
     /**
@@ -200,6 +204,7 @@ define(['questAPI'], function(Quest){
         },
         {
             inherit:'basicPage',
+			inherit:'mmPage',
 			questions: [
                 {inherit:'mm18'},
                 {inherit:'mm13'},
