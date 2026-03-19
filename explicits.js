@@ -62,6 +62,12 @@ define(['questAPI'], function(Quest){
         ]
     });
 
+	let mmInstructionsHtml = [
+        '<div style="margin: 0 0 18px; padding: 14px 16px; border: 1px solid #d9d9d9; border-left: 5px solid #222; background: #f7f7f7; border-radius: 4px;">',
+        '<div style="font-weight: 700; font-size: 1.05em; margin-bottom: 8px;">Instructions: Indicate the extent to which you agree or disagree with each item. Please be open and honest in your responding.</div>',
+        '<div style="font-size: 0.98em; line-height: 1.5;"><strong>In comparison to other racial minorities (e.g., African American, Hispanics, Native Americans)…………………</strong></div>',
+        '</div>'
+    ].join('');
 	
     /**
 	*Specific questions
@@ -96,7 +102,7 @@ define(['questAPI'], function(Quest){
 	API.addQuestionsSet('mm18',{
         inherit: 'mmLikert7',
         name: 'mm18_work_ethic',
-        stem: '1. Asian Americans generally perform better on standardized exams (i.e., SAT) because of their values in academic achievement.'
+        stem: mmInstructionsHtml + '1. Asian Americans generally perform better on standardized exams (i.e., SAT) because of their values in academic achievement.'
     });
 
     API.addQuestionsSet('mm13',{
