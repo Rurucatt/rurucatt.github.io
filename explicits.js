@@ -204,7 +204,6 @@ define(['questAPI'], function(Quest){
             ]
         },
         {
-            inherit:'basicPage',
 			inherit:'mmPage',
 			questions: [
                 {inherit:'mm18'},
