@@ -123,6 +123,36 @@ define(['managerAPI',
         
         { type: 'post', path: ['$isTouch', 'raceSet', 'blackLabels', 'whiteLabels'] },
 
+		{
+            type: 'injectStyle',
+            css: [
+                '[pi-quest] .btn-default {background-image: none !important;}',
+                '[pi-quest] .btn-group-vertical > .btn.btn-default,' +
+                    ' [pi-quest] .btn-group-vertical > label.btn.btn-default,' +
+                    ' [pi-quest] .btn-group > .btn.btn-default,' +
+                    ' [pi-quest] .btn-group > label.btn.btn-default {' +
+                    'background: #fff !important; color: #333 !important; border-color: #d9d9d9 !important;' +
+                '}',
+                '[pi-quest] .btn-group-vertical > .btn.btn-default:hover,' +
+                    ' [pi-quest] .btn-group-vertical > label.btn.btn-default:hover,' +
+                    ' [pi-quest] .btn-group > .btn.btn-default:hover,' +
+                    ' [pi-quest] .btn-group > label.btn.btn-default:hover {' +
+                    'background: #f7f7f7 !important;' +
+                '}',
+                '[pi-quest] .btn-group-vertical > .btn.btn-default.active,' +
+                    ' [pi-quest] .btn-group-vertical > label.btn.btn-default.active,' +
+                    ' [pi-quest] .btn-group > .btn.btn-default.active,' +
+                    ' [pi-quest] .btn-group > label.btn.btn-default.active,' +
+                    ' [pi-quest] .btn-group-vertical > .btn.btn-default:active,' +
+                    ' [pi-quest] .btn-group-vertical > label.btn.btn-default:active,' +
+                    ' [pi-quest] .btn-group > .btn.btn-default:active,' +
+                    ' [pi-quest] .btn-group > label.btn.btn-default:active {' +
+                    'background: #e9f2ff !important; border-color: #7aa7e0 !important; color: #1f3f68 !important;' +
+                '}'
+            ]
+        },
+
+		
         // apply touch only styles
         {
             mixer:'branch',
