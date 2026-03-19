@@ -139,6 +139,12 @@ define(['managerAPI',
                     ' [pi-quest] .btn-group > label.btn.btn-default:hover {' +
                     'background: #f7f7f7 !important;' +
                 '}',
+                '[pi-quest] .btn-group-vertical > .btn.btn-default:focus,' +
+                    ' [pi-quest] .btn-group-vertical > label.btn.btn-default:focus,' +
+                    ' [pi-quest] .btn-group > .btn.btn-default:focus,' +
+                    ' [pi-quest] .btn-group > label.btn.btn-default:focus {' +
+                    'background: #fff !important; color: #333 !important; border-color: #d9d9d9 !important; box-shadow: none !important;' +
+                '}',
                 '[pi-quest] .btn-group-vertical > .btn.btn-default.active,' +
                     ' [pi-quest] .btn-group-vertical > label.btn.btn-default.active,' +
                     ' [pi-quest] .btn-group > .btn.btn-default.active,' +
@@ -152,7 +158,6 @@ define(['managerAPI',
             ]
         },
 
-		
         // apply touch only styles
         {
             mixer:'branch',
