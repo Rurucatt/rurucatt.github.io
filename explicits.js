@@ -102,7 +102,7 @@ define(['questAPI'], function(Quest){
 	API.addQuestionsSet('mm18',{
         inherit: 'mmLikert7',
         name: 'mm18_work_ethic',
-        stem: '1. Asian Americans generally perform better on standardized exams (i.e., SAT) because of their values in academic achievement.'
+        stem: mmInstructionsHtml + '1. Asian Americans generally perform better on standardized exams (i.e., SAT) because of their values in academic achievement.'
     });
 
     API.addQuestionsSet('mm13',{
@@ -200,7 +200,6 @@ define(['questAPI'], function(Quest){
         },
         {
             inherit:'basicPage',
-			text: mmInstructionsHtml,
 			questions: [
                 {inherit:'mm18'},
                 {inherit:'mm13'},
