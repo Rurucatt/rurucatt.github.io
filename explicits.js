@@ -10,7 +10,7 @@ define(['questAPI'], function(Quest){
 		header: 'Questionnaire',
         decline: true,
         declineText: isTouch ? 'Decline' : 'Decline to Answer', 
-        autoFocus:true, 
+        //autoFocus:true, 
         //progressBar:  'Page <%= pagesMeta.number %> out of 2'
 
 		API.addPagesSet('mmPage',{
