@@ -11,7 +11,7 @@ define(['questAPI'], function(Quest){
         decline: true,
         declineText: isTouch ? 'Decline' : 'Decline to Answer', 
         autoFocus:true, 
-        progressBar:  'Page <%= pagesMeta.number %> out of 4'
+        progressBar:  'Page <%= pagesMeta.number %> out of 2'
     });
 	
     /**
@@ -196,30 +196,17 @@ define(['questAPI'], function(Quest){
         },
         {
             inherit:'basicPage',
-            //questions: {inherit: thermOrder[0]}
 			questions: [
                 {inherit:'mm18'},
                 {inherit:'mm13'},
                 {inherit:'mm16'},
                 {inherit:'mm17'},
-                {inherit:'mm29'}
-            ]
-        },
-        {
-            inherit:'basicPage',
-            //questions: {inherit: thermOrder[1]}
-			questions: [
+                {inherit:'mm29'},
                 {inherit:'mm9'},
                 {inherit:'mm3'},
                 {inherit:'mm5'},
                 {inherit:'mm8'},
-                {inherit:'mm7'}
-            ]
-        },
-        {
-            inherit:'basicPage',
-            //questions: {inherit:'attributes7'}
-			questions: [
+                {inherit:'mm7'},
                 {inherit:'mm20'},
                 {inherit:'mm32'},
                 {inherit:'mm10'},
