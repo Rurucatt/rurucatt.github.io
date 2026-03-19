@@ -12,8 +12,9 @@ define(['questAPI'], function(Quest){
         declineText: isTouch ? 'Decline' : 'Decline to Answer', 
         //autoFocus:true, 
         //progressBar:  'Page <%= pagesMeta.number %> out of 2'
-
-		API.addPagesSet('mmPage',{
+	});
+	
+	API.addPagesSet('mmPage',{
         inherit: 'basicPage',
         autoFocus: false
     });
