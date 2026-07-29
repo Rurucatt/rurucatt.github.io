@@ -2,7 +2,7 @@ define(['questAPI'], function(Quest){
     let API = new Quest();
     let isTouch = API.getGlobal().$isTouch;
 
-    /*
+        /*
      * Quest's selectOne control is styled as a Bootstrap toggle button, which
      * normally allows a second click to clear it.  These page-specific DOM
      * enhancements restore native radio behaviour and place the three Other
@@ -35,7 +35,7 @@ define(['questAPI'], function(Quest){
         }
 
         function selected(input, option){
-            return !!(input && (input.checked || option.classList.contains('active')));
+            return !!((input && input.checked) || option.classList.contains('active'));
         }
 
         function addError(target, message){
@@ -113,10 +113,8 @@ define(['questAPI'], function(Quest){
                     event.preventDefault();
                     event.stopPropagation();
                 } else {
-                    setTimeout(function(){
-                        let item = option.closest('li');
-                        if (item) clearError(item);
-                    }, 0);
+                    let item = option.closest('li');
+                    if (item) clearError(item);
                 }
             }, true);
 
@@ -140,9 +138,9 @@ define(['questAPI'], function(Quest){
                     let choices = Array.prototype.filter.call(controls, function(control){
                         return control.type === 'radio' || control.type === 'checkbox';
                     });
-                    let answered = choices.length ? Array.prototype.some.call(choices, function(control){
-                        return control.checked || control.closest('label.active');
-                    }) : Array.prototype.some.call(controls, function(control){
+                    let hasChoiceControls = choices.length || item.querySelector('.btn-group, .btn-group-vertical');
+                    let answered = hasChoiceControls ? !!item.querySelector('label.active, button.active, .btn.active') ||
+                        Array.prototype.some.call(choices, function(control){ return control.checked; }) : Array.prototype.some.call(controls, function(control){
                         return control.value.trim() !== '';
                     });
                     if (index === 6 && answered){
@@ -292,7 +290,7 @@ define(['questAPI'], function(Quest){
 
 	//API.addQuestionsSet('age',{
     //    inherit : 'basicText',
-    API.addQuestionsSet('educationStudent',{
+       API.addQuestionsSet('educationStudent',{
         inherit: 'demographicsSelect',
         name: 'education_student',
         stem: 'Are you currently a student studying education?',
@@ -361,7 +359,7 @@ define(['questAPI'], function(Quest){
         inherit: 'demographicsText',
 		name: 'age',
     //    stem: 'What is your age?'
-	    stem: 'What is your age? (years)',
+	     stem: 'What is your age? (years)',
         inputType: 'number',
         min: 1,
         max: 120,
@@ -373,7 +371,7 @@ define(['questAPI'], function(Quest){
         }
     });
 
-    API.addQuestionsSet('sexAssignedAtBirth',{
+     API.addQuestionsSet('sexAssignedAtBirth',{
         inherit: 'demographicsSelect',
         name: 'sex_assigned_at_birth',
         stem: 'What is your sex assigned at birth?',
@@ -384,7 +382,7 @@ define(['questAPI'], function(Quest){
         ]
     });
 
-     API.addQuestionsSet('genderIdentity',{
+         API.addQuestionsSet('genderIdentity',{
         inherit: 'demographicsSelect',
         name: 'gender_identity',
         stem: 'What is your gender?',
@@ -454,7 +452,7 @@ define(['questAPI'], function(Quest){
             {text: 'Yes', value: 'yes'},
             {text: 'No', value: 'no'}
         ]
-    });
+	}); 
 
 	//let thermOrder = API.shuffle(['thermBlack', 'thermWhite']);
 
