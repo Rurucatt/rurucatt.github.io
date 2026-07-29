@@ -1,12 +1,14 @@
-<html>
+<!-- <html> -->
+<!doctype html>
+<html lang="en">
     <head>
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/minnojs/minno-quest@0.3/dist/main.css" />
-		<style type="text/css">
-        .container {padding-top: 15px;}
-		</style>
+		<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/minnojs/minno-quest@0.3/dist/main.css" /> -->
+		<!-- <style type="text/css"> -->
+        <!-- .container {padding-top: 15px;} -->
+		<!-- </style> -->
         
 
-        <script>
+        <!-- <script> -->
             // load MinnoJS from the CDN (you probably don't need to change this)
             var scriptTag                = document.createElement('script');
             scriptTag.src                = 'https://cdn.jsdelivr.net/gh/minnojs/minno-quest@0.3/dist/pi-minno.js';
@@ -35,9 +37,121 @@
                 
                 // We need to wait a few miliseconds for Qualtrics to register the value that we entered
                 minnoJS.onEnd = function () { setTimeout(proceed, 100); }
-            }
-        </script>
+        
+		<meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Teacher Judgements about Students’ Behaviors – Study Blurb</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/minnojs/minno-quest@0.3/dist/main.css" />
+        <style>
+            body { background: #fff; color: #333; }
+            .container { padding-top: 15px; }
+            .study-blurb { max-width: 900px; margin: 0 auto; padding: 15px; }
+            .study-blurb__heading { margin: 0; font-size: 2em; line-height: 1.25; }
+            .study-blurb__subtitle { display: block; margin-top: 0.2em; font-size: 0.72em; }
+            .study-blurb__body { font-size: 1.15em; line-height: 1.55; }
+            .study-blurb__body p { margin: 0 0 1.25em; }
+            .study-blurb fieldset { margin: 0; padding: 0; border: 0; }
+            .study-blurb legend { margin-bottom: 0.75em; border: 0; font-size: 1.15em; line-height: 1.5; }
+            .study-blurb__option { display: block; margin: 0.7em 0; font-size: 1.1em; font-weight: normal; }
+            .study-blurb__option input { margin-right: 0.5em; }
+            .study-blurb__actions { margin-top: 1.5em; text-align: center; }
+            .exit-message { max-width: 700px; margin: 10vh auto; padding: 15px; text-align: center; }
+            .exit-message p { margin-top: 1.5em; font-size: 1.3em; line-height: 1.5; }
+            [hidden] { display: none !important; }
+            @media (max-width: 600px) {
+                .study-blurb { padding: 10px; }
+                .study-blurb__heading { font-size: 1.6em; }
+                .study-blurb__body { font-size: 1em; }   
+			}
+        /* </script> */
+		</style>
     </head>
     <body>
-    </body>
+            <main id="study-blurb" class="study-blurb">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h1 class="panel-title study-blurb__heading">
+                        Teacher Judgements about Students’ Behaviors
+                        <span class="study-blurb__subtitle">Study Blurb</span>
+                    </h1>
+                </div>
+                <div class="panel-body study-blurb__body">
+                    <p><strong>Purpose:</strong> The purpose of this research study is to understand how students studying education make judgments about child learner traits.</p>
+
+                    <p><strong>Method:</strong> Individuals will complete a brief questionnaire over the internet using a platform called the Open Science Framework for us to find out if they are eligible for the study. Individuals who are eligible will be able to complete the online study.</p>
+
+                    <p><strong>Reimbursements:</strong> There are no costs for participating in the study. Eligible participants who complete all study procedures will be entered into a raffle to win a $20 Amazon gift. You will have a one in thirty chance of winning the raffle prize. If you win the raffle prize, you will receive a $20 Amazon gift card via email within one week of winning. The gift card will be emailed to the address you provide. If you do not complete all parts of the study, you will not be entered into the raffle and will not have a chance of being compensated.</p>
+
+                    <p><strong>There is no payment for taking part in any other part of this study, including this screening.</strong></p>
+
+                    <p>The first step in finding out if an individual may be eligible for the study is to ask you some questions concerning your background and current situation. The information you provide will be kept confidential and will not be released to anyone except personnel working on this study, and possibly the IRB.</p>
+
+                    <form id="study-blurb-form">
+                        <fieldset>
+                            <legend>If this information seems satisfactory, are you willing to participate in the internet screen now?</legend>
+                            <label class="study-blurb__option"><input type="radio" name="screening_blurb_response" value="yes" required /> Yes</label>
+                            <label class="study-blurb__option"><input type="radio" name="screening_blurb_response" value="no" required /> No</label>
+                        </fieldset>
+                        <div class="study-blurb__actions">
+                            <button type="submit" class="btn btn-primary btn-lg">Continue</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+
+        <main id="exit-page" class="exit-message" hidden>
+            <div class="panel panel-info">
+                <div class="panel-heading"><h1 class="panel-title">Thank You</h1></div>
+                <div class="panel-body">
+                    <p>Thank you for your time and interest in this study. You may now close this browser window.</p>
+                </div>
+            </div>
+        </main>
+
+        <script>
+            (function () {
+                var responseKey = 'screening_blurb_response';
+                var form = document.getElementById('study-blurb-form');
+                var blurb = document.getElementById('study-blurb');
+                var exitPage = document.getElementById('exit-page');
+
+                function showExitPage() {
+                    blurb.hidden = true;
+                    exitPage.hidden = false;
+                    document.title = 'Thank You';
+                }
+
+                function launchStudy() {
+                    blurb.hidden = true;
+                    var scriptTag = document.createElement('script');
+                    scriptTag.src = 'https://cdn.jsdelivr.net/gh/minnojs/minno-quest@0.3/dist/pi-minno.js';
+                    scriptTag.onload = function () {
+                        var container = document.createElement('div');
+                        container.className = 'container';
+                        var canvas = document.createElement('div');
+                        container.appendChild(canvas);
+                        document.body.appendChild(container);
+
+                        minnoJS(canvas, 'mgr.js');
+                        minnoJS.onEnd = function () { setTimeout(proceed, 100); };
+                    };
+                    document.head.appendChild(scriptTag);
+                }
+
+                if (sessionStorage.getItem(responseKey) === 'no') {
+                    showExitPage();
+                    return;
+                }
+
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    var answer = form.elements[responseKey].value;
+                    sessionStorage.setItem(responseKey, answer);
+                    if (answer === 'yes') launchStudy();
+                    else showExitPage();
+                });
+            }());
+        </script>
+	</body>
 </html>
