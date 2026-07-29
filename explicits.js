@@ -35,7 +35,9 @@ define(['questAPI'], function(Quest){
         }
 
         function selected(input, option){
-            return !!((input && input.checked) || option.classList.contains('active'));
+       //     return !!((input && input.checked) || option.classList.contains('active'));
+		      return option.dataset.demographicsSelected === 'true' ||
+                !!((input && input.checked) || option.classList.contains('active') || option.getAttribute('aria-pressed') === 'true');	
         }
 
         function addError(target, message){
@@ -89,8 +91,16 @@ define(['questAPI'], function(Quest){
             });
             updateAvailability();
 
-            owner.inlineOther = {option: option, choice: choice, input: textInput, wrapper: wrapper, message: message};
-        }
+            //owner.inlineOther = {option: option, choice: choice, input: textInput, wrapper: wrapper, message: message};
+        	owner.inlineOther = {
+                option: option,
+                choice: choice,
+                input: textInput,
+                wrapper: wrapper,
+                message: message,
+                updateAvailability: updateAvailability
+            };
+		}
 
         function enhance(page){
             if (page.dataset.demographicsReady) return;
@@ -104,17 +114,34 @@ define(['questAPI'], function(Quest){
             inlineOther(items, 8, 9, 'Please enter your gender identity.');
             inlineOther(items, 10, 11, 'Please enter your race.');
 
-            page.addEventListener('click', function(event){
+            Array.prototype.forEach.call(page.querySelectorAll('label.btn, .btn-group label, .btn-group-vertical label'), function(option){
+                let input = option.querySelector('input[type="radio"], input[type="checkbox"]');
+                option.dataset.demographicsSelected = selected(input, option) ? 'true' : 'false';
+            });
+			
+			page.addEventListener('click', function(event){
                 let option = event.target.closest('label.btn, .btn-group label, .btn-group-vertical label');
                 if (!option || !page.contains(option)) return;
                 if (event.target.closest('.demographics-inline-other')) return;
+
+				let item = option.closest('li');
+                let isRace = item === items[10];
+				
                 let radio = option.querySelector('input[type="radio"]');
-                if (radio && selected(radio, option)){
+                if (!isRace && selected(radio, option)){
                     event.preventDefault();
                     event.stopPropagation();
                 } else {
-                    let item = option.closest('li');
-                    if (item) clearError(item);
+                    //let item = option.closest('li');
+                    if (isRace){
+                        option.dataset.demographicsSelected = selected(option.querySelector('input[type="checkbox"]'), option) ? 'false' : 'true';
+                    } else {
+                        Array.prototype.forEach.call(item.querySelectorAll('label.btn, .btn-group label, .btn-group-vertical label'), function(sibling){
+                            sibling.dataset.demographicsSelected = sibling === option ? 'true' : 'false';
+                        });
+                    }
+                    if (item && item.inlineOther) item.inlineOther.updateAvailability();
+					if (item) clearError(item);
                 }
             }, true);
 
@@ -139,7 +166,7 @@ define(['questAPI'], function(Quest){
                         return control.type === 'radio' || control.type === 'checkbox';
                     });
                     let hasChoiceControls = choices.length || item.querySelector('.btn-group, .btn-group-vertical');
-                    let answered = hasChoiceControls ? !!item.querySelector('label.active, button.active, .btn.active') ||
+                    let answered = hasChoiceControls ? !!item.querySelector('[data-demographics-selected="true"], label.active, button.active, .btn.active, [aria-pressed="true"]') ||
                         Array.prototype.some.call(choices, function(control){ return control.checked; }) : Array.prototype.some.call(controls, function(control){
                         return control.value.trim() !== '';
                     });
