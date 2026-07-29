@@ -11,6 +11,8 @@ define(['managerAPI',
 	//const subid = Date.now().toString(16)+Math.floor(Math.random()*10000).toString(16);
 	API.addSettings('file_type','csv');
 
+	var screeningBlurbResponse = sessionStorage.getItem('screening_blurb_response');
+
 	init_data_pipe(API, 'QndRZhvO2atW', {file_type:'csv'});
 	
 	//init_data_pipe(API, 'QndRZhvO2atW', 'csv');	
@@ -33,6 +35,7 @@ define(['managerAPI',
 
     API.addGlobal({
         raceiat:{},
+		screening_blurb_response:screeningBlurbResponse,
         //YBYB: change when copying back to the correct folder
 		baseURL: './images/',
         raceSet:raceSet,
@@ -121,7 +124,7 @@ define(['managerAPI',
     API.addSequence([
         { type: 'isTouch' }, //Use Minno's internal touch detection mechanism. 
         
-        { type: 'post', path: ['$isTouch', 'raceSet', 'blackLabels', 'whiteLabels'] },
+        { type: 'post', path: ['$isTouch', 'screening_blurb_response', 'raceSet', 'blackLabels', 'whiteLabels'] },
 
 		{
             type: 'injectStyle',
