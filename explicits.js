@@ -1,6 +1,184 @@
 define(['questAPI'], function(Quest){
     let API = new Quest();
     let isTouch = API.getGlobal().$isTouch;
+
+    /*
+     * Quest's selectOne control is styled as a Bootstrap toggle button, which
+     * normally allows a second click to clear it.  These page-specific DOM
+     * enhancements restore native radio behaviour and place the three Other
+     * text questions inside their owning options without changing their Quest
+     * models (and therefore without changing the explicit-data output).
+     */
+    function installDemographicsEnhancements(){
+        if (typeof document === 'undefined' || document.getElementById('demographics-enhancement-styles')) return;
+
+        let style = document.createElement('style');
+        style.id = 'demographics-enhancement-styles';
+        style.textContent = [
+            '.demographics-inline-other {display:flex; flex-wrap:wrap; align-items:center; gap:8px; max-width:100%;}',
+            '.demographics-inline-other input {display:inline-block; flex:1 1 220px; min-width:140px; max-width:360px; width:auto;}',
+            '.demographics-inline-other .demographics-validation-error {flex-basis:100%;}',
+            '.demographics-validation-error {display:block; margin:5px 0 0; color:#a94442; font-weight:normal;}',
+            '.demographics-hidden-question {display:none !important;}',
+            '@media (max-width:480px) {',
+            ' .demographics-inline-other {align-items:flex-start;}',
+            ' .demographics-inline-other input {flex-basis:100%; max-width:100%;}',
+            '}'
+        ].join('\n');
+        document.head.appendChild(style);
+
+        function questionItems(page){
+            let list = page.querySelector('ol');
+            return list ? Array.prototype.filter.call(list.children, function(item){
+                return item.tagName.toLowerCase() === 'li';
+            }) : [];
+        }
+
+        function selected(input, option){
+            return !!(input && (input.checked || option.classList.contains('active')));
+        }
+
+        function addError(target, message){
+            let error = target.querySelector('.demographics-validation-error');
+            if (!error){
+                error = document.createElement('span');
+                error.className = 'demographics-validation-error';
+                error.setAttribute('role', 'alert');
+                target.appendChild(error);
+            }
+            error.textContent = message;
+        }
+
+        function clearError(target){
+            Array.prototype.forEach.call(target.querySelectorAll('.demographics-validation-error'), function(error){
+                error.parentNode.removeChild(error);
+            });
+        }
+
+        function inlineOther(items, ownerIndex, textIndex, message){
+            let owner = items[ownerIndex];
+            let textQuestion = items[textIndex];
+            if (!owner || !textQuestion || owner.dataset.inlineOtherReady) return;
+
+            let options = owner.querySelectorAll('label.btn, .btn-group label, .btn-group-vertical label');
+            let option = options[options.length - 1];
+            let textInput = textQuestion.querySelector('input:not([type="hidden"]), textarea');
+            if (!option || !textInput) return;
+
+            owner.dataset.inlineOtherReady = 'true';
+            textQuestion.classList.add('demographics-hidden-question');
+            textQuestion.setAttribute('aria-hidden', 'true');
+
+            let wrapper = document.createElement('span');
+            wrapper.className = 'demographics-inline-other';
+            option.appendChild(document.createTextNode(': '));
+            option.appendChild(wrapper);
+            wrapper.appendChild(textInput);
+            textInput.setAttribute('aria-label', message.replace(/^Please enter |\.$/g, ''));
+
+            let choice = option.querySelector('input[type="radio"], input[type="checkbox"]');
+            function updateAvailability(){
+                let active = selected(choice, option);
+                textInput.disabled = !active;
+                if (!active) clearError(wrapper);
+            }
+            option.addEventListener('click', function(){ setTimeout(updateAvailability, 0); });
+            textInput.addEventListener('click', function(event){ event.stopPropagation(); });
+            textInput.addEventListener('input', function(){
+                if (textInput.value.trim()) clearError(wrapper);
+            });
+            updateAvailability();
+
+            owner.inlineOther = {option: option, choice: choice, input: textInput, wrapper: wrapper, message: message};
+        }
+
+        function enhance(page){
+            if (page.dataset.demographicsReady) return;
+            let heading = page.querySelector('h3');
+            if (!heading || heading.textContent.trim() !== 'Demographics and Screening Form') return;
+            let items = questionItems(page);
+            if (items.length < 15) return;
+
+            page.dataset.demographicsReady = 'true';
+            inlineOther(items, 3, 4, 'Please enter the state in which you study.');
+            inlineOther(items, 8, 9, 'Please enter your gender identity.');
+            inlineOther(items, 10, 11, 'Please enter your race.');
+
+            page.addEventListener('click', function(event){
+                let option = event.target.closest('label.btn, .btn-group label, .btn-group-vertical label');
+                if (!option || !page.contains(option)) return;
+                if (event.target.closest('.demographics-inline-other')) return;
+                let radio = option.querySelector('input[type="radio"]');
+                if (radio && selected(radio, option)){
+                    event.preventDefault();
+                    event.stopPropagation();
+                } else {
+                    setTimeout(function(){
+                        let item = option.closest('li');
+                        if (item) clearError(item);
+                    }, 0);
+                }
+            }, true);
+
+            let regularIndexes = [0, 1, 2, 3, 5, 6, 7, 8, 10, 12, 13, 14];
+            Array.prototype.forEach.call(page.querySelectorAll('input, textarea, select'), function(input){
+                let eventName = input.type === 'text' || input.type === 'number' || input.type === 'date' ? 'input' : 'change';
+                input.addEventListener(eventName, function(){
+                    let item = input.closest('li');
+                    if (item) clearError(item);
+                });
+            });
+
+            let submit = page.querySelector('[ng-click="submit()"]');
+            if (!submit) return;
+            submit.addEventListener('click', function(event){
+                let firstInvalid = null;
+
+                regularIndexes.forEach(function(index){
+                    let item = items[index];
+                    let controls = item.querySelectorAll('input:not([type="hidden"]), textarea, select');
+                    let choices = Array.prototype.filter.call(controls, function(control){
+                        return control.type === 'radio' || control.type === 'checkbox';
+                    });
+                    let answered = choices.length ? Array.prototype.some.call(choices, function(control){
+                        return control.checked || control.closest('label.active');
+                    }) : Array.prototype.some.call(controls, function(control){
+                        return control.value.trim() !== '';
+                    });
+                    if (index === 6 && answered){
+                        let age = Array.prototype.find.call(controls, function(control){ return control.type !== 'hidden'; });
+                        answered = !!age && /^\d+$/.test(age.value.trim()) && Number(age.value) >= 1 && Number(age.value) <= 120;
+                    }
+                    if (!answered){
+                        addError(item, 'Please answer this question before submitting.');
+                        if (!firstInvalid) firstInvalid = item;
+                    }
+                });
+
+                [3, 8, 10].forEach(function(index){
+                    let other = items[index].inlineOther;
+                    if (other && selected(other.choice, other.option) && !other.input.value.trim()){
+                        addError(other.wrapper, other.message);
+                        if (!firstInvalid) firstInvalid = other.option;
+                    }
+                });
+
+                if (firstInvalid){
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                    firstInvalid.scrollIntoView({behavior: 'smooth', block: 'center'});
+                }
+            }, true);
+        }
+
+        let observer = new MutationObserver(function(){
+            Array.prototype.forEach.call(document.querySelectorAll('[piq-page]'), enhance);
+        });
+        observer.observe(document.body, {childList: true, subtree: true});
+        Array.prototype.forEach.call(document.querySelectorAll('[piq-page]'), enhance);
+    }
+
+    installDemographicsEnhancements();
 	
     /**
 	* Page prototype
@@ -14,6 +192,11 @@ define(['questAPI'], function(Quest){
         //autoFocus:true, 
         //progressBar:  'Page <%= pagesMeta.number %> out of 2'
 	});
+	
+    API.addPagesSet('demographicsPage',{
+        inherit: 'basicPage',
+        header: 'Demographics and Screening Form'
+    });
 	
 	API.addPagesSet('mmPage',{
         inherit: 'basicPage',
@@ -44,6 +227,12 @@ define(['questAPI'], function(Quest){
         type: 'selectOne'
     });
 	
+	    API.addQuestionsSet('demographicsSelect',{
+        inherit: 'basicSelect',
+        autoSubmit: false,
+        required: false
+    });
+
     API.addQuestionsSet('basicDropdown',{
         inherit :'basicQ',
         type : 'dropdown',
@@ -55,7 +244,12 @@ define(['questAPI'], function(Quest){
         type : 'text',
         autoSubmit:false
     });
-	
+
+	    API.addQuestionsSet('demographicsText',{
+        inherit: 'basicText',
+        required: false
+    });
+
     API.addQuestionsSet('basicMultiSelect',{
         inherit: 'basicQ',
         type: 'selectMulti',
@@ -64,6 +258,12 @@ define(['questAPI'], function(Quest){
             required: 'Please select at least one answer before submitting.'
         }
     });
+
+    API.addQuestionsSet('demographicsMultiSelect',{
+        inherit: 'basicMultiSelect',
+        required: false
+    });
+	
 	
    //API.addQuestionsSet('therm',{
 	 API.addQuestionsSet('mmLikert7',{
@@ -92,8 +292,8 @@ define(['questAPI'], function(Quest){
 
 	//API.addQuestionsSet('age',{
     //    inherit : 'basicText',
-        API.addQuestionsSet('educationStudent',{
-        inherit: 'basicSelect',
+    API.addQuestionsSet('educationStudent',{
+        inherit: 'demographicsSelect',
         name: 'education_student',
         stem: 'Are you currently a student studying education?',
         answers: [
@@ -103,7 +303,7 @@ define(['questAPI'], function(Quest){
     });
 
     API.addQuestionsSet('studentLevel',{
-        inherit: 'basicSelect',
+        inherit: 'demographicsSelect',
         name: 'student_level',
         stem: 'Are you an undergraduate or graduate student?',
         answers: [
@@ -113,7 +313,7 @@ define(['questAPI'], function(Quest){
     });
 
     API.addQuestionsSet('yearOfStudy',{
-        inherit: 'basicSelect',
+        inherit: 'demographicsSelect',
         name: 'year_of_study',
         stem: 'Please select your year of study.',
         answers: [
@@ -126,7 +326,7 @@ define(['questAPI'], function(Quest){
     });
 
     API.addQuestionsSet('studyState',{
-        inherit: 'basicSelect',
+        inherit: 'demographicsSelect',
         name: 'study_state',
         stem: 'Please select the state in which you study.',
         answers: [
@@ -144,24 +344,24 @@ define(['questAPI'], function(Quest){
     });
 
     API.addQuestionsSet('studyStateOther',{
-        inherit: 'basicText',
+        inherit: 'demographicsText',
         name: 'study_state_other',
-        stem: 'Please enter the state in which you study.',
-        depends: {question: 'study_state', answer: 'other'}
+        required: false,
+        stem: 'Please enter the state in which you study.'
     });
 
     API.addQuestionsSet('dateOfBirth',{
-        inherit: 'basicText',
+        inherit: 'demographicsText',
         name: 'date_of_birth',
         stem: 'Please enter your date of birth.',
         inputType: 'date'
     });
 
     API.addQuestionsSet('age',{
-        inherit: 'basicText',
+        inherit: 'demographicsText',
 		name: 'age',
     //    stem: 'What is your age?'
-		stem: 'What is your age? (years)',
+	    stem: 'What is your age? (years)',
         inputType: 'number',
         min: 1,
         max: 120,
@@ -174,7 +374,7 @@ define(['questAPI'], function(Quest){
     });
 
     API.addQuestionsSet('sexAssignedAtBirth',{
-        inherit: 'basicSelect',
+        inherit: 'demographicsSelect',
         name: 'sex_assigned_at_birth',
         stem: 'What is your sex assigned at birth?',
         answers: [
@@ -184,8 +384,8 @@ define(['questAPI'], function(Quest){
         ]
     });
 
-    API.addQuestionsSet('genderIdentity',{
-        inherit: 'basicSelect',
+     API.addQuestionsSet('genderIdentity',{
+        inherit: 'demographicsSelect',
         name: 'gender_identity',
         stem: 'What is your gender?',
         answers: [
@@ -199,14 +399,14 @@ define(['questAPI'], function(Quest){
     });
 
     API.addQuestionsSet('genderIdentityOther',{
-        inherit: 'basicText',
+        inherit: 'demographicsText',
         name: 'gender_identity_other',
-        stem: 'Please enter your gender identity.',
-        depends: {question: 'gender_identity', answer: 'other'}
+        required: false,
+        stem: 'Please enter your gender identity.'
     });
 
     API.addQuestionsSet('race',{
-        inherit: 'basicMultiSelect',
+        inherit: 'demographicsMultiSelect',
         name: 'race',
         stem: 'Please select your race. You may select more than one option.',
         answers: [
@@ -220,14 +420,14 @@ define(['questAPI'], function(Quest){
     });
 
     API.addQuestionsSet('raceOther',{
-        inherit: 'basicText',
+        inherit: 'demographicsText',
         name: 'race_other',
-        stem: 'Please enter your race.',
-        depends: {question: 'race', answer: 'other'}
+        required: false,
+        stem: 'Please enter your race.'
     });
 
     API.addQuestionsSet('ethnicity',{
-        inherit: 'basicSelect',
+        inherit: 'demographicsSelect',
         name: 'ethnicity',
         stem: 'Please select your ethnicity.',
         answers: [
@@ -236,30 +436,18 @@ define(['questAPI'], function(Quest){
         ]
     });
 
-    //API.addQuestionsSet('gender',{
-    //    inherit : 'basicDropdown',
-    //    name: 'gender',
-    //    stem: 'Gender',
     API.addQuestionsSet('englishComprehension',{
-        inherit: 'basicSelect',
+        inherit: 'demographicsSelect',
         name: 'english_comprehension',
-        stem: 'Are you able to read and understand English?',    
-		answers: [
-            //{text:'Female', value:'F'},
-            //{text:'Male', value:'M'},
-            //{text:'Non-binary', value:'NB'},
-            //{text:'Prefer not to say', value:'NA'}
-			{text: 'Yes', value: 'yes'},
+        stem: 'Are you able to read and understand English?',
+        answers: [
+            {text: 'Yes', value: 'yes'},
             {text: 'No', value: 'no'}
         ]
     });
 
-    //API.addQuestionsSet('major',{
-     //   inherit : 'basicText',
-     //   name: 'major',
-     //   stem: 'What is your major?'
-	API.addQuestionsSet('keyboardDevice',{
-        inherit: 'basicSelect',
+    API.addQuestionsSet('keyboardDevice',{
+        inherit: 'demographicsSelect',
         name: 'keyboard_device',
         stem: 'Are you able to complete this study on a personal device with a keyboard?',
         answers: [
@@ -362,7 +550,7 @@ define(['questAPI'], function(Quest){
 
     API.addSequence([
         {
-            inherit:'basicPage',
+            inherit:'demographicsPage',
             questions: [
                 //{inherit:'age'},
                 //{inherit:'gender'},
