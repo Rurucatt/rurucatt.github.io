@@ -8,8 +8,9 @@ define(['questAPI'], function(Quest){
     API.addPagesSet('basicPage',{
         noSubmit:false, //Change to true if you don't want to show the submit button.
 		header: 'Questionnaire',
-        decline: true,
-        declineText: isTouch ? 'Decline' : 'Decline to Answer', 
+		decline: false,
+        //decline: true,
+        //declineText: isTouch ? 'Decline' : 'Decline to Answer', 
         //autoFocus:true, 
         //progressBar:  'Page <%= pagesMeta.number %> out of 2'
 	});
@@ -23,13 +24,15 @@ define(['questAPI'], function(Quest){
 	* Question prototypes
 	*/
     API.addQuestionsSet('basicQ',{
-        decline: 'true',
-        required : true, 		
+        //decline: 'true',
+        decline: false,
+		required : true, 		
         errorMsg: {
-            required: isTouch 
-                ? 'Please select an answer, or click \'Decline\'' 
-                : 'Please select an answer, or click \'Decline to Answer\''
-        },
+    //        required: isTouch 
+    //            ? 'Please select an answer, or click \'Decline\'' 
+    //            : 'Please select an answer, or click \'Decline to Answer\''
+        	required: 'Please answer this question before submitting.'
+		},
         autoSubmit:'true',
         numericValues:'true',
         help: '<%= pagesMeta.number < 3 %>',
@@ -51,6 +54,15 @@ define(['questAPI'], function(Quest){
         inherit :'basicQ',
         type : 'text',
         autoSubmit:false
+    });
+	
+    API.addQuestionsSet('basicMultiSelect',{
+        inherit: 'basicQ',
+        type: 'selectMulti',
+        autoSubmit: false,
+        errorMsg: {
+            required: 'Please select at least one answer before submitting.'
+        }
     });
 	
    //API.addQuestionsSet('therm',{
@@ -78,28 +90,182 @@ define(['questAPI'], function(Quest){
 	*Specific questions
 	*/	
 
-	API.addQuestionsSet('age',{
-        inherit : 'basicText',
-        name: 'age',
-        stem: 'What is your age?'
-    });
-
-    API.addQuestionsSet('gender',{
-        inherit : 'basicDropdown',
-        name: 'gender',
-        stem: 'Gender',
+	//API.addQuestionsSet('age',{
+    //    inherit : 'basicText',
+        API.addQuestionsSet('educationStudent',{
+        inherit: 'basicSelect',
+        name: 'education_student',
+        stem: 'Are you currently a student studying education?',
         answers: [
-            {text:'Female', value:'F'},
-            {text:'Male', value:'M'},
-            {text:'Non-binary', value:'NB'},
-            {text:'Prefer not to say', value:'NA'}
+            {text: 'Yes', value: 'yes'},
+            {text: 'No', value: 'no'}
         ]
     });
 
-    API.addQuestionsSet('major',{
-        inherit : 'basicText',
-        name: 'major',
-        stem: 'What is your major?'
+    API.addQuestionsSet('studentLevel',{
+        inherit: 'basicSelect',
+        name: 'student_level',
+        stem: 'Are you an undergraduate or graduate student?',
+        answers: [
+            {text: 'Undergraduate', value: 'undergraduate'},
+            {text: 'Graduate', value: 'graduate'}
+        ]
+    });
+
+    API.addQuestionsSet('yearOfStudy',{
+        inherit: 'basicSelect',
+        name: 'year_of_study',
+        stem: 'Please select your year of study.',
+        answers: [
+            {text: 'First Year', value: 'first_year'},
+            {text: 'Second Year', value: 'second_year'},
+            {text: 'Third Year', value: 'third_year'},
+            {text: 'Fourth Year', value: 'fourth_year'},
+            {text: 'Fifth Year', value: 'fifth_year'}
+        ]
+    });
+
+    API.addQuestionsSet('studyState',{
+        inherit: 'basicSelect',
+        name: 'study_state',
+        stem: 'Please select the state in which you study.',
+        answers: [
+            {text: 'Connecticut', value: 'CT'},
+            {text: 'Maine', value: 'ME'},
+            {text: 'Massachusetts', value: 'MA'},
+            {text: 'New Hampshire', value: 'NH'},
+            {text: 'New Jersey', value: 'NJ'},
+            {text: 'New York', value: 'NY'},
+            {text: 'Pennsylvania', value: 'PA'},
+            {text: 'Rhode Island', value: 'RI'},
+            {text: 'Vermont', value: 'VT'},
+            {text: 'I study in a state that is not listed above', value: 'other'}
+        ]
+    });
+
+    API.addQuestionsSet('studyStateOther',{
+        inherit: 'basicText',
+        name: 'study_state_other',
+        stem: 'Please enter the state in which you study.',
+        depends: {question: 'study_state', answer: 'other'}
+    });
+
+    API.addQuestionsSet('dateOfBirth',{
+        inherit: 'basicText',
+        name: 'date_of_birth',
+        stem: 'Please enter your date of birth.',
+        inputType: 'date'
+    });
+
+    API.addQuestionsSet('age',{
+        inherit: 'basicText',
+		name: 'age',
+    //    stem: 'What is your age?'
+		stem: 'What is your age? (years)',
+        inputType: 'number',
+        min: 1,
+        max: 120,
+        step: 1,
+        pattern: '^[0-9]+$',
+        errorMsg: {
+            required: 'Please enter your age as a whole number.',
+            pattern: 'Please enter your age as a whole number.'
+        }
+    });
+
+    API.addQuestionsSet('sexAssignedAtBirth',{
+        inherit: 'basicSelect',
+        name: 'sex_assigned_at_birth',
+        stem: 'What is your sex assigned at birth?',
+        answers: [
+            {text: 'Male', value: 'male'},
+            {text: 'Female', value: 'female'},
+            {text: 'Intersex', value: 'intersex'}
+        ]
+    });
+
+    API.addQuestionsSet('genderIdentity',{
+        inherit: 'basicSelect',
+        name: 'gender_identity',
+        stem: 'What is your gender?',
+        answers: [
+            {text: 'Male', value: 'male'},
+            {text: 'Female', value: 'female'},
+            {text: 'Trans-male', value: 'trans_male'},
+            {text: 'Trans-female', value: 'trans_female'},
+            {text: 'Non-binary', value: 'non_binary'},
+            {text: 'Gender Identity not listed', value: 'other'}
+        ]
+    });
+
+    API.addQuestionsSet('genderIdentityOther',{
+        inherit: 'basicText',
+        name: 'gender_identity_other',
+        stem: 'Please enter your gender identity.',
+        depends: {question: 'gender_identity', answer: 'other'}
+    });
+
+    API.addQuestionsSet('race',{
+        inherit: 'basicMultiSelect',
+        name: 'race',
+        stem: 'Please select your race. You may select more than one option.',
+        answers: [
+            {text: 'American Indian or Alaska Native', value: 'american_indian_alaska_native'},
+            {text: 'Asian', value: 'asian'},
+            {text: 'Black or African American', value: 'black_african_american'},
+            {text: 'Native Hawaiian or Other Pacific Islander', value: 'native_hawaiian_pacific_islander'},
+            {text: 'White', value: 'white'},
+            {text: 'Other', value: 'other'}
+        ]
+    });
+
+    API.addQuestionsSet('raceOther',{
+        inherit: 'basicText',
+        name: 'race_other',
+        stem: 'Please enter your race.',
+        depends: {question: 'race', answer: 'other'}
+    });
+
+    API.addQuestionsSet('ethnicity',{
+        inherit: 'basicSelect',
+        name: 'ethnicity',
+        stem: 'Please select your ethnicity.',
+        answers: [
+            {text: 'Hispanic/Latinx', value: 'hispanic_latinx'},
+            {text: 'Non-Hispanic/Latinx', value: 'non_hispanic_latinx'}
+        ]
+    });
+
+    //API.addQuestionsSet('gender',{
+    //    inherit : 'basicDropdown',
+    //    name: 'gender',
+    //    stem: 'Gender',
+    API.addQuestionsSet('englishComprehension',{
+        inherit: 'basicSelect',
+        name: 'english_comprehension',
+        stem: 'Are you able to read and understand English?',    
+		answers: [
+            //{text:'Female', value:'F'},
+            //{text:'Male', value:'M'},
+            //{text:'Non-binary', value:'NB'},
+            //{text:'Prefer not to say', value:'NA'}
+			{text: 'Yes', value: 'yes'},
+            {text: 'No', value: 'no'}
+        ]
+    });
+
+    //API.addQuestionsSet('major',{
+     //   inherit : 'basicText',
+     //   name: 'major',
+     //   stem: 'What is your major?'
+	API.addQuestionsSet('keyboardDevice',{
+        inherit: 'basicSelect',
+        name: 'keyboard_device',
+        stem: 'Are you able to complete this study on a personal device with a keyboard?',
+        answers: [
+            {text: 'Yes', value: 'yes'},
+            {text: 'No', value: 'no'}
+        ]
     });
 
 	//let thermOrder = API.shuffle(['thermBlack', 'thermWhite']);
@@ -198,9 +364,24 @@ define(['questAPI'], function(Quest){
         {
             inherit:'basicPage',
             questions: [
-                {inherit:'age'},
-                {inherit:'gender'},
-                {inherit:'major'}
+                //{inherit:'age'},
+                //{inherit:'gender'},
+                //{inherit:'major'}
+				{inherit: 'educationStudent'},
+                {inherit: 'studentLevel'},
+                {inherit: 'yearOfStudy'},
+                {inherit: 'studyState'},
+                {inherit: 'studyStateOther'},
+                {inherit: 'dateOfBirth'},
+                {inherit: 'age'},
+                {inherit: 'sexAssignedAtBirth'},
+                {inherit: 'genderIdentity'},
+                {inherit: 'genderIdentityOther'},
+                {inherit: 'race'},
+                {inherit: 'raceOther'},
+                {inherit: 'ethnicity'},
+                {inherit: 'englishComprehension'},
+                {inherit: 'keyboardDevice'}
             ]
         },
         {
