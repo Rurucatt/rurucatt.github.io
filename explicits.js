@@ -2,7 +2,7 @@ define(['questAPI'], function(Quest){
     let API = new Quest();
     let isTouch = API.getGlobal().$isTouch;
 
-    // Quest renders the three free-text "Other" answers as separate questions.
+	// Quest renders the three free-text "Other" answers as separate questions.
     // Move only their existing input elements into the corresponding last option;
     // Quest still owns the inputs and their values.
     function placeOtherInputsInline(){
@@ -20,7 +20,7 @@ define(['questAPI'], function(Quest){
             document.head.appendChild(style);
         }
 
-        function moveInput(input, expectedStem){
+		    function moveInput(input, expectedStem){
             var inputQuestion = input.closest('li');
             if (!inputQuestion || inputQuestion.getAttribute('data-inline-other')) return;
             if (inputQuestion.textContent.indexOf(expectedStem) === -1) return;
@@ -43,26 +43,28 @@ define(['questAPI'], function(Quest){
             // Focusing or typing in the field must not toggle the owning option.
             input.addEventListener('click', function(event){ event.stopPropagation(); });
         }
-		
-        function enhance(){
+
+		    function enhance(){
             var stems = [
                 'Please enter the state in which you study.',
                 'Please enter your gender identity.',
                 'Please enter your race.'
             ];
+
             var inputs = document.querySelectorAll('[piq-page] input:not([type="hidden"]), [piq-page] textarea');
             Array.prototype.forEach.call(inputs, function(input){
                 stems.forEach(function(stem){ moveInput(input, stem); });
-            });	
+            });
         }
-		var observer = new MutationObserver(enhance);
-        observer.observe(document.body, {childList: true, subtree: true});
-		enhance();
-		}
-       
-		placeOtherInputsInline();
-			
-			/**
+        	var observer = new MutationObserver(enhance);
+        	observer.observe(document.body, {childList: true, subtree: true});
+        
+       		enhance();
+    	}
+
+	    placeOtherInputsInline();
+
+		 /**
 	* Page prototype
 	*/
     API.addPagesSet('basicPage',{
@@ -79,13 +81,8 @@ define(['questAPI'], function(Quest){
         inherit: 'basicPage',
         header: 'Demographics and Screening Form'
     });
-	
-	API.addPagesSet('mmPage',{
-        inherit: 'basicPage',
-        autoFocus: false
-    });
-	
-    /**
+
+		/**
 	* Question prototypes
 	*/
     API.addQuestionsSet('basicQ',{
@@ -109,25 +106,14 @@ define(['questAPI'], function(Quest){
         type: 'selectOne'
     });
 	
-	    API.addQuestionsSet('demographicsSelect',{
-        inherit: 'basicSelect',
-        autoSubmit: false,
-        required: false
-    });
-
-    API.addQuestionsSet('basicDropdown',{
-        inherit :'basicQ',
-        type : 'dropdown',
-        autoSubmit:false
-    });
-
-	API.addQuestionsSet('basicText',{
+	API.addQuestionsSet('demographicsSelect',{
+@@ -268,71 +121,50 @@ define(['questAPI'], function(Quest){
         inherit :'basicQ',
         type : 'text',
         autoSubmit:false
     });
 
-	    API.addQuestionsSet('demographicsText',{
+	API.addQuestionsSet('demographicsText',{
         inherit: 'basicText',
         required: false
     });
@@ -145,36 +131,14 @@ define(['questAPI'], function(Quest){
         inherit: 'basicMultiSelect',
         required: false
     });
-	
-	
-   //API.addQuestionsSet('therm',{
-	 API.addQuestionsSet('mmLikert7',{
-        inherit: 'basicSelect',
-        answers: [
-            {text:'Strongly disagree', value:1},
-            {text:'Disagree', value:2},
-            {text:'Slightly disagree', value:3},
-            {text:'Neither agree nor disagree', value:4},
-            {text:'Slightly agree', value:5},
-            {text:'Agree', value:6},
-            {text:'Strongly agree', value:7}
-        ]
-    });
 
-	let mmInstructionsHtml = [
-        '<div style="margin: 0 0 18px; padding: 14px 16px; border: 1px solid #d9d9d9; border-left: 5px solid #222; background: #f7f7f7; border-radius: 4px;">',
-        '<div style="font-weight: 700; font-size: 1.05em; margin-bottom: 8px;">Instructions: Indicate the extent to which you agree or disagree with each item. Please be open and honest in your responding.</div>',
-        '<div style="font-size: 0.98em; line-height: 1.5;"><strong>In comparison to other racial minorities (e.g., African American, Hispanics, Native Americans)…………………</strong></div>',
-        '</div>'
-    ].join('');
-	
-    /**
+			 /**
 	*Specific questions
 	*/	
 
 	//API.addQuestionsSet('age',{
     //    inherit : 'basicText',
-       API.addQuestionsSet('educationStudent',{
+    API.addQuestionsSet('educationStudent',{
         inherit: 'demographicsSelect',
         name: 'education_student',
         stem: 'Are you currently a student studying education?',
@@ -193,9 +157,7 @@ define(['questAPI'], function(Quest){
             {text: 'Graduate', value: 'graduate'}
         ]
     });
-
-    API.addQuestionsSet('yearOfStudy',{
-        inherit: 'demographicsSelect',
+@@ -342,51 +174,51 @@ define(['questAPI'], function(Quest){
         name: 'year_of_study',
         stem: 'Please select your year of study.',
         answers: [
@@ -221,7 +183,7 @@ define(['questAPI'], function(Quest){
             {text: 'Pennsylvania', value: 'PA'},
             {text: 'Rhode Island', value: 'RI'},
             {text: 'Vermont', value: 'VT'},
-            {text: 'I study in a state that is not listed above (specify)', value: 'other'}
+			{text: 'I study in a state that is not listed above (specify)', value: 'other'}
         ]
     });
 
@@ -247,10 +209,7 @@ define(['questAPI'], function(Quest){
         inputType: 'number',
         min: 1,
         max: 120,
-        step: 1,
-        pattern: '^[0-9]+$',
-        errorMsg: {
-            required: 'Please enter your age as a whole number.',
+@@ -397,227 +229,110 @@ define(['questAPI'], function(Quest){
             pattern: 'Please enter your age as a whole number.'
         }
     });
@@ -266,7 +225,7 @@ define(['questAPI'], function(Quest){
         ]
     });
 
-         API.addQuestionsSet('genderIdentity',{
+    API.addQuestionsSet('genderIdentity',{
         inherit: 'demographicsSelect',
         name: 'gender_identity',
         stem: 'What is your gender?',
@@ -276,7 +235,7 @@ define(['questAPI'], function(Quest){
             {text: 'Trans-male', value: 'trans_male'},
             {text: 'Trans-female', value: 'trans_female'},
             {text: 'Non-binary', value: 'non_binary'},
-            {text: 'Gender Identity not listed (specify)', value: 'other'}
+			{text: 'Gender Identity not listed (specify)', value: 'other'}
         ]
     });
 
@@ -297,7 +256,7 @@ define(['questAPI'], function(Quest){
             {text: 'Black or African American', value: 'black_african_american'},
             {text: 'Native Hawaiian or Other Pacific Islander', value: 'native_hawaiian_pacific_islander'},
             {text: 'White', value: 'white'},
-            {text: 'Other (specify)', value: 'other'}
+			{text: 'Other (specify)', value: 'other'}
         ]
     });
 
@@ -337,144 +296,27 @@ define(['questAPI'], function(Quest){
             {text: 'No', value: 'no'}
         ]
 	}); 
-
-	//let thermOrder = API.shuffle(['thermBlack', 'thermWhite']);
-
-	API.addQuestionsSet('mm18',{
-        inherit: 'mmLikert7',
-        name: 'mm18_work_ethic',
-        stem: mmInstructionsHtml + '1. Asian Americans generally perform better on standardized exams (i.e., SAT) because of their values in academic achievement.'
-    });
-
-    API.addQuestionsSet('mm13',{
-        inherit: 'mmLikert7',
-        name: 'mm13_harder_workers',
-        stem: '2. Asian Americans are less likely to face barriers at work.'
-    });
-
-    API.addQuestionsSet('mm16',{
-        inherit: 'mmLikert7',
-        name: 'mm16_success_despite_racism',
-        stem: '3. Asian Americans make more money because they work harder.'
-    });
-
-    API.addQuestionsSet('mm17',{
-        inherit: 'mmLikert7',
-        name: 'mm17_motivated_success',
-        stem: '4. Asian Americans are more likely to persist through tough situations.'
-    });
-
-    API.addQuestionsSet('mm29',{
-        inherit: 'mmLikert7',
-        name: 'mm29_higher_gpa',
-        stem: '5. Asian Americans are more likely to be treated as equal to European Americans.'
-    });
-
-    API.addQuestionsSet('mm9',{
-        inherit: 'mmLikert7',
-        name: 'mm9_better_grades',
-        stem: '6. Asian Americans are more likely to be good at math and science.'
-    });
-
-    API.addQuestionsSet('mm3',{
-        inherit: 'mmLikert7',
-        name: 'mm3_standardized_exams',
-        stem: '7. Asian Americans get better grades in school because they study harder.'
-    });
-
-    API.addQuestionsSet('mm5',{
-        inherit: 'mmLikert7',
-        name: 'mm5_more_money',
-        stem: '8. Asian Americans are less likely to experience racism in the United States.'
-    });
-
-    API.addQuestionsSet('mm8',{
-        inherit: 'mmLikert7',
-        name: 'mm8_math_science',
-        stem: '9. Asian Americans are harder workers.'
-    });
-
-    API.addQuestionsSet('mm7',{
-        inherit: 'mmLikert7',
-        name: 'mm7_persist_tough',
-        stem: '10. Despite experiences with racism, Asian Americans are more likely to achieve academic and economic success.'
-    });
-
-    API.addQuestionsSet('mm20',{
-        inherit: 'mmLikert7',
-        name: 'mm20_less_work_barriers',
-        stem: '11. Asian Americans are more motivated to be successful.'
-    });
-
-    API.addQuestionsSet('mm32',{
-        inherit: 'mmLikert7',
-        name: 'mm32_less_prejudice',
-        stem: '12. Asian Americans have stronger work ethics.'
-    });
-
-    API.addQuestionsSet('mm10',{
-        inherit: 'mmLikert7',
-        name: 'mm10_less_racism',
-        stem: '13. It is easier for Asian Americans to climb the corporate ladder.'
-    });
-
-    API.addQuestionsSet('mm11',{
-        inherit: 'mmLikert7',
-        name: 'mm11_treated_as_equals',
-        stem: '14. Asian Americans generally have higher grade point averages in school because academic success is more important.'
-    });
-
-    API.addQuestionsSet('mm23',{
-        inherit: 'mmLikert7',
-        name: 'mm23_easier_ladder',
-        stem: '15. Asian Americans are less likely to encounter racial prejudice and discrimination.'
-    });
-
-    API.addSequence([
-        {
-            inherit:'demographicsPage',
-            questions: [
-                //{inherit:'age'},
-                //{inherit:'gender'},
-                //{inherit:'major'}
-				{inherit: 'educationStudent'},
-                {inherit: 'studentLevel'},
-                {inherit: 'yearOfStudy'},
-                {inherit: 'studyState'},
-                {inherit: 'studyStateOther'},
-                {inherit: 'dateOfBirth'},
-                {inherit: 'age'},
-                {inherit: 'sexAssignedAtBirth'},
-                {inherit: 'genderIdentity'},
-                {inherit: 'genderIdentityOther'},
-                {inherit: 'race'},
-                {inherit: 'raceOther'},
-                {inherit: 'ethnicity'},
-                {inherit: 'englishComprehension'},
-                {inherit: 'keyboardDevice'}
-            ]
-        },
-        {
-			inherit:'mmPage',
-			questions: [
-                {inherit:'mm18'},
-                {inherit:'mm13'},
-                {inherit:'mm16'},
-                {inherit:'mm17'},
-                {inherit:'mm29'},
-                {inherit:'mm9'},
-                {inherit:'mm3'},
-                {inherit:'mm5'},
-                {inherit:'mm8'},
-                {inherit:'mm7'},
-                {inherit:'mm20'},
-                {inherit:'mm32'},
-                {inherit:'mm10'},
-                {inherit:'mm11'},
-                {inherit:'mm23'}
-            ]
-        }
-    ]);
+			
+		API.addSequence([{
+        inherit: 'demographicsPage',
+        questions: [
+            {inherit: 'educationStudent'},
+            {inherit: 'studentLevel'},
+            {inherit: 'yearOfStudy'},
+            {inherit: 'studyState'},
+            {inherit: 'studyStateOther'},
+            {inherit: 'dateOfBirth'},
+            {inherit: 'age'},
+            {inherit: 'sexAssignedAtBirth'},
+            {inherit: 'genderIdentity'},
+            {inherit: 'genderIdentityOther'},
+            {inherit: 'race'},
+            {inherit: 'raceOther'},
+            {inherit: 'ethnicity'},
+            {inherit: 'englishComprehension'},
+            {inherit: 'keyboardDevice'}
+        ]
+    }]);
 
     return API.script;
 });
