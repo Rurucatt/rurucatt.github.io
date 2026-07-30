@@ -2,7 +2,7 @@ define(['questAPI'], function(Quest){
     let API = new Quest();
     let isTouch = API.getGlobal().$isTouch;
 
-	 // Quest renders the three free-text "Other" answers as separate questions.
+    // Quest renders the three free-text "Other" answers as separate questions.
     // Move only their existing input elements into the corresponding last option;
     // Quest still owns the inputs and their values.
     function placeOtherInputsInline(){
@@ -13,26 +13,24 @@ define(['questAPI'], function(Quest){
             style.id = 'inline-other-style';
             style.textContent = [
                 '.inline-other-answer { display: inline-flex; align-items: center; gap: 8px; margin-left: 4px; vertical-align: middle; }',
-                '.inline-other-answer input { width: 260px; max-width: 100%; padding: 5px 8px; color: #333; background: #fff; }',
+                '.inline-other-answer input { width: 260px; max-width: 100%; padding: 3px 4px; color: #333; background: transparent; border: 0; border-bottom: 1px solid #777; border-radius: 0; box-shadow: none; }',
+                '.inline-other-answer input:focus { border-color: #337ab7; outline: 0; box-shadow: 0 1px 0 #337ab7; }',
                 '@media (max-width: 600px) { .inline-other-answer { display: flex; margin: 8px 0 0; } .inline-other-answer input { width: 100%; } }'
             ].join('\n');
             document.head.appendChild(style);
         }
 
-		function pageItems(page){
-            var list = page.querySelector('ol');
-            return list ? Array.prototype.slice.call(list.children) : [];
-        }
+        function moveInput(input, expectedStem){
+            var inputQuestion = input.closest('li');
+            if (!inputQuestion || inputQuestion.getAttribute('data-inline-other')) return;
+            if (inputQuestion.textContent.indexOf(expectedStem) === -1) return;
 
-        function moveInput(items, optionIndex, inputIndex){
-            var optionQuestion = items[optionIndex];
-            var inputQuestion = items[inputIndex];
-            if (!optionQuestion || !inputQuestion || inputQuestion.getAttribute('data-inline-other')) return;
-
-            var options = optionQuestion.querySelectorAll('label.btn, .btn-group label, .btn-group-vertical label');
+            // Each free-text question immediately follows the choice it belongs to.
+            var optionQuestion = inputQuestion.previousElementSibling;
+            if (!optionQuestion) return;
+            var options = optionQuestion.querySelectorAll('.btn');
             var option = options[options.length - 1];
-            var input = inputQuestion.querySelector('input:not([type="hidden"]), textarea');
-            if (!option || !input) return;
+            if (!option) return;
 
             var inline = document.createElement('span');
             inline.className = 'inline-other-answer';
@@ -46,22 +44,22 @@ define(['questAPI'], function(Quest){
             input.addEventListener('click', function(event){ event.stopPropagation(); });
         }
 		
-		function enhance(page){
-			var heading = page.querySelector('h3');
-			if (!heading || heading.textContent.trim() !== 'Demographics and Screening Form') return;
-    		var items = pageItems(page);
-            if (items.length < 15) return;
-			moveInput(items, 3, 4);
-            moveInput(items, 8, 9);
-            moveInput(items, 10, 11);
+        function enhance(){
+            var stems = [
+                'Please enter the state in which you study.',
+                'Please enter your gender identity.',
+                'Please enter your race.'
+            ];
+            var inputs = document.querySelectorAll('[piq-page] input:not([type="hidden"]), [piq-page] textarea');
+            Array.prototype.forEach.call(inputs, function(input){
+                stems.forEach(function(stem){ moveInput(input, stem); });
+            });	
         }
-		var observer = new MutationObserver(function(){
-            Array.prototype.forEach.call(document.querySelectorAll('[piq-page]'), enhance);
-        });
+		var observer = new MutationObserver(enhance);
         observer.observe(document.body, {childList: true, subtree: true});
-        Array.prototype.forEach.call(document.querySelectorAll('[piq-page]'), enhance);
-    }
-
+		enhance();
+		}
+       
 		placeOtherInputsInline();
 			
 			/**
