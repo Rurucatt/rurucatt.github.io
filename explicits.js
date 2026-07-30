@@ -2,8 +2,69 @@ define(['questAPI'], function(Quest){
     let API = new Quest();
     let isTouch = API.getGlobal().$isTouch;
 
+	 // Quest renders the three free-text "Other" answers as separate questions.
+    // Move only their existing input elements into the corresponding last option;
+    // Quest still owns the inputs and their values.
+    function placeOtherInputsInline(){
+        if (typeof document === 'undefined') return;
 
-    /**
+        if (!document.getElementById('inline-other-style')){
+            var style = document.createElement('style');
+            style.id = 'inline-other-style';
+            style.textContent = [
+                '.inline-other-answer { display: inline-flex; align-items: center; gap: 8px; margin-left: 4px; vertical-align: middle; }',
+                '.inline-other-answer input { width: 260px; max-width: 100%; padding: 5px 8px; color: #333; background: #fff; }',
+                '@media (max-width: 600px) { .inline-other-answer { display: flex; margin: 8px 0 0; } .inline-other-answer input { width: 100%; } }'
+            ].join('\n');
+            document.head.appendChild(style);
+        }
+
+		function pageItems(page){
+            var list = page.querySelector('ol');
+            return list ? Array.prototype.slice.call(list.children) : [];
+        }
+
+        function moveInput(items, optionIndex, inputIndex){
+            var optionQuestion = items[optionIndex];
+            var inputQuestion = items[inputIndex];
+            if (!optionQuestion || !inputQuestion || inputQuestion.getAttribute('data-inline-other')) return;
+
+            var options = optionQuestion.querySelectorAll('label.btn, .btn-group label, .btn-group-vertical label');
+            var option = options[options.length - 1];
+            var input = inputQuestion.querySelector('input:not([type="hidden"]), textarea');
+            if (!option || !input) return;
+
+            var inline = document.createElement('span');
+            inline.className = 'inline-other-answer';
+            inline.appendChild(document.createTextNode(':'));
+            inline.appendChild(input);
+            option.appendChild(inline);
+            inputQuestion.style.display = 'none';
+            inputQuestion.setAttribute('data-inline-other', 'true');
+
+            // Focusing or typing in the field must not toggle the owning option.
+            input.addEventListener('click', function(event){ event.stopPropagation(); });
+        }
+		
+		function enhance(page){
+			var heading = page.querySelector('h3');
+			if (!heading || heading.textContent.trim() !== 'Demographics and Screening Form') return;
+    		var items = pageItems(page);
+            if (items.length < 15) return;
+			moveInput(items, 3, 4);
+            moveInput(items, 8, 9);
+            moveInput(items, 10, 11);
+        }
+		var observer = new MutationObserver(function(){
+            Array.prototype.forEach.call(document.querySelectorAll('[piq-page]'), enhance);
+        });
+        observer.observe(document.body, {childList: true, subtree: true});
+        Array.prototype.forEach.call(document.querySelectorAll('[piq-page]'), enhance);
+    }
+
+		placeOtherInputsInline();
+			
+			/**
 	* Page prototype
 	*/
     API.addPagesSet('basicPage',{
@@ -162,7 +223,7 @@ define(['questAPI'], function(Quest){
             {text: 'Pennsylvania', value: 'PA'},
             {text: 'Rhode Island', value: 'RI'},
             {text: 'Vermont', value: 'VT'},
-            {text: 'I study in a state that is not listed above', value: 'other'}
+            {text: 'I study in a state that is not listed above (specify)', value: 'other'}
         ]
     });
 
@@ -217,7 +278,7 @@ define(['questAPI'], function(Quest){
             {text: 'Trans-male', value: 'trans_male'},
             {text: 'Trans-female', value: 'trans_female'},
             {text: 'Non-binary', value: 'non_binary'},
-            {text: 'Gender Identity not listed', value: 'other'}
+            {text: 'Gender Identity not listed (specify)', value: 'other'}
         ]
     });
 
@@ -238,7 +299,7 @@ define(['questAPI'], function(Quest){
             {text: 'Black or African American', value: 'black_african_american'},
             {text: 'Native Hawaiian or Other Pacific Islander', value: 'native_hawaiian_pacific_islander'},
             {text: 'White', value: 'white'},
-            {text: 'Other', value: 'other'}
+            {text: 'Other (specify)', value: 'other'}
         ]
     });
 
