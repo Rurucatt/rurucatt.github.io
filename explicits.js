@@ -40,17 +40,6 @@ define(['questAPI'], function(Quest){
                 !!((input && input.checked) || option.classList.contains('active') || option.getAttribute('aria-pressed') === 'true');	
         }
 
-        function addError(target, message){
-            let error = target.querySelector('.demographics-validation-error');
-            if (!error){
-                error = document.createElement('span');
-                error.className = 'demographics-validation-error';
-                error.setAttribute('role', 'alert');
-                target.appendChild(error);
-            }
-            error.textContent = message;
-        }
-
         function clearError(target){
             Array.prototype.forEach.call(target.querySelectorAll('.demographics-validation-error'), function(error){
                 error.parentNode.removeChild(error);
@@ -145,7 +134,6 @@ define(['questAPI'], function(Quest){
                 }
             }, true);
 
-            let regularIndexes = [0, 1, 2, 3, 5, 6, 7, 8, 10, 12, 13, 14];
             Array.prototype.forEach.call(page.querySelectorAll('input, textarea, select'), function(input){
                 let eventName = input.type === 'text' || input.type === 'number' || input.type === 'date' ? 'input' : 'change';
                 input.addEventListener(eventName, function(){
@@ -153,49 +141,12 @@ define(['questAPI'], function(Quest){
                     if (item) clearError(item);
                 });
             });
-
-            let submit = page.querySelector('[ng-click="submit()"]');
-            if (!submit) return;
-            submit.addEventListener('click', function(event){
-                let firstInvalid = null;
-
-                regularIndexes.forEach(function(index){
-                    let item = items[index];
-                    let controls = item.querySelectorAll('input:not([type="hidden"]), textarea, select');
-                    let choices = Array.prototype.filter.call(controls, function(control){
-                        return control.type === 'radio' || control.type === 'checkbox';
-                    });
-                    let hasChoiceControls = choices.length || item.querySelector('.btn-group, .btn-group-vertical');
-                    let answered = hasChoiceControls ? !!item.querySelector('[data-demographics-selected="true"], label.active, button.active, .btn.active, [aria-pressed="true"]') ||
-                        Array.prototype.some.call(choices, function(control){ return control.checked; }) : Array.prototype.some.call(controls, function(control){
-                        return control.value.trim() !== '';
-                    });
-                    if (index === 6 && answered){
-                        let age = Array.prototype.find.call(controls, function(control){ return control.type !== 'hidden'; });
-                        answered = !!age && /^\d+$/.test(age.value.trim()) && Number(age.value) >= 1 && Number(age.value) <= 120;
-                    }
-                    if (!answered){
-                        addError(item, 'Please answer this question before submitting.');
-                        if (!firstInvalid) firstInvalid = item;
-                    }
-                });
-
-                [3, 8, 10].forEach(function(index){
-                    let other = items[index].inlineOther;
-                    if (other && selected(other.choice, other.option) && !other.input.value.trim()){
-                        addError(other.wrapper, other.message);
-                        if (!firstInvalid) firstInvalid = other.option;
-                    }
-                });
-
-                if (firstInvalid){
-                    event.preventDefault();
-                    event.stopImmediatePropagation();
-                    firstInvalid.scrollIntoView({behavior: 'smooth', block: 'center'});
-                }
-            }, true);
-        }
-
+            // Do not add a second submit validator here. Quest owns the question
+            // models and submission lifecycle; validating the rendered Bootstrap
+            // controls can lag behind Quest's model and incorrectly reject answers.
+            // Demographic questions are intentionally optional, so submission must
+            // always be allowed to reach Quest.
+            
         let observer = new MutationObserver(function(){
             Array.prototype.forEach.call(document.querySelectorAll('[piq-page]'), enhance);
         });
