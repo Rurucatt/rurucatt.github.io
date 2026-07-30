@@ -1,324 +1,157 @@
-define(['questAPI'], function(Quest){
-    let API = new Quest();
-    let isTouch = API.getGlobal().$isTouch;
-
-	// Quest renders the three free-text "Other" answers as separate questions.
-    // Move only their existing input elements into the corresponding last option;
-    // Quest still owns the inputs and their values.
-    function placeOtherInputsInline(){
-        if (typeof document === 'undefined') return;
-
-        if (!document.getElementById('inline-other-style')){
-            var style = document.createElement('style');
-            style.id = 'inline-other-style';
-            style.textContent = [
-                '.inline-other-answer { display: inline-flex; align-items: center; gap: 8px; margin-left: 4px; vertical-align: middle; }',
-                '.inline-other-answer input { width: 260px; max-width: 100%; padding: 3px 4px; color: #333; background: transparent; border: 0; border-bottom: 1px solid #777; border-radius: 0; box-shadow: none; }',
-                '.inline-other-answer input:focus { border-color: #337ab7; outline: 0; box-shadow: 0 1px 0 #337ab7; }',
-                '@media (max-width: 600px) { .inline-other-answer { display: flex; margin: 8px 0 0; } .inline-other-answer input { width: 100%; } }'
-            ].join('\n');
-            document.head.appendChild(style);
-        }
-
-		    function moveInput(input, expectedStem){
-            var inputQuestion = input.closest('li');
-            if (!inputQuestion || inputQuestion.getAttribute('data-inline-other')) return;
-            if (inputQuestion.textContent.indexOf(expectedStem) === -1) return;
-
-            // Each free-text question immediately follows the choice it belongs to.
-            var optionQuestion = inputQuestion.previousElementSibling;
-            if (!optionQuestion) return;
-            var options = optionQuestion.querySelectorAll('.btn');
-            var option = options[options.length - 1];
-            if (!option) return;
-
-            var inline = document.createElement('span');
-            inline.className = 'inline-other-answer';
-            inline.appendChild(document.createTextNode(':'));
-            inline.appendChild(input);
-            option.appendChild(inline);
-            inputQuestion.style.display = 'none';
-            inputQuestion.setAttribute('data-inline-other', 'true');
-
-            // Focusing or typing in the field must not toggle the owning option.
-            input.addEventListener('click', function(event){ event.stopPropagation(); });
-        }
-
-		    function enhance(){
-            var stems = [
-                'Please enter the state in which you study.',
-                'Please enter your gender identity.',
-                'Please enter your race.'
-            ];
-
-            var inputs = document.querySelectorAll('[piq-page] input:not([type="hidden"]), [piq-page] textarea');
-            Array.prototype.forEach.call(inputs, function(input){
-                stems.forEach(function(stem){ moveInput(input, stem); });
-            });
-        }
-        	var observer = new MutationObserver(enhance);
-        	observer.observe(document.body, {childList: true, subtree: true});
+<!-- <html> -->
+<!doctype html>
+<html lang="en">
+    <head>
+		<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/minnojs/minno-quest@0.3/dist/main.css" /> -->
+		<!-- <style type="text/css"> -->
+        <!-- .container {padding-top: 15px;} -->
+		<!-- </style> -->
         
-       		enhance();
-    	}
 
-	    placeOtherInputsInline();
+        <!-- <script> -->
+            <!-- // load MinnoJS from the CDN (you probably don't need to change this) -->
+            <!-- var scriptTag                = document.createElement('script'); -->
+            <!-- scriptTag.src                = 'https://cdn.jsdelivr.net/gh/minnojs/minno-quest@0.3/dist/pi-minno.js'; -->
+            <!-- scriptTag.onload             = onLoad; -->
+            <!-- scriptTag.onreadystatechange = onLoad; -->
+            <!-- document.head.appendChild(scriptTag); -->
+        
+            <!-- // This function gets activated only after MinnoJS is loaded -->
+            <!-- function onLoad() { -->
+				<!-- // Create a div with class 'container' and id 'minno-app' -->
+				<!-- var container = document.createElement('div'); -->
+				<!-- container.className = 'container'; -->
 
-		 /**
-	* Page prototype
-	*/
-    API.addPagesSet('basicPage',{
-        noSubmit:false, //Change to true if you don't want to show the submit button.
-		header: 'Questionnaire',
-		decline: false,
-        //decline: true,
-        //declineText: isTouch ? 'Decline' : 'Decline to Answer', 
-        //autoFocus:true, 
-        //progressBar:  'Page <%= pagesMeta.number %> out of 2'
-	});
-	
-    API.addPagesSet('demographicsPage',{
-        inherit: 'basicPage',
-        header: 'Demographics and Screening Form'
-    });
+				<!-- // Create the canvas object -->
+				<!-- var canvas = document.createElement('div'); -->
 
-		/**
-	* Question prototypes
-	*/
-    API.addQuestionsSet('basicQ',{
-        //decline: 'true',
-        decline: false,
-		required : true, 		
-        errorMsg: {
-    //        required: isTouch 
-    //            ? 'Please select an answer, or click \'Decline\'' 
-    //            : 'Please select an answer, or click \'Decline to Answer\''
-        	required: 'Please answer this question before submitting.'
-		},
-        autoSubmit:'true',
-        numericValues:'true',
-        help: '<%= pagesMeta.number < 3 %>',
-        //helpText: 'Tip: For quick response, click to select your answer, and then click again to submit.'
-    });
+				<!-- // Append the canvas object to the container -->
+				<!-- container.appendChild(canvas); -->
 
-    API.addQuestionsSet('basicSelect',{
-        inherit :'basicQ',
-        type: 'selectOne'
-    });
-	
-	API.addQuestionsSet('demographicsSelect',{
-@@ -268,71 +121,50 @@ define(['questAPI'], function(Quest){
-        inherit :'basicQ',
-        type : 'text',
-        autoSubmit:false
-    });
+				<!-- // Append the container to the body -->
+				<!-- document.body.appendChild(container); -->
+        
 
-	API.addQuestionsSet('demographicsText',{
-        inherit: 'basicText',
-        required: false
-    });
+				<!-- // Run your study (just set the correct URL) -->
+                <!-- minnoJS(canvas, 'mgr.js'); -->
+                
+                <!-- // We need to wait a few miliseconds for Qualtrics to register the value that we entered -->
+                <!-- minnoJS.onEnd = function () { setTimeout(proceed, 100); } -->
+        
+		<meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Teacher Judgements about Students’ Behaviors – Study Blurb</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/minnojs/minno-quest@0.3/dist/main.css" />
+        <style>
+            body { background: #fff; color: #333; }
+            .container { padding-top: 15px; }
+            .study-blurb { max-width: 900px; margin: 0 auto; padding: 15px; }
+            .study-blurb__heading { margin: 0; font-size: 2em; line-height: 1.25; }
+            .study-blurb__subtitle { display: block; margin-top: 0.2em; font-size: 0.72em; }
+            .study-blurb__body { font-size: 1.15em; line-height: 1.55; }
+            .study-blurb__body p { margin: 0 0 1.25em; }
+            .study-blurb fieldset { margin: 0; padding: 0; border: 0; }
+            .study-blurb legend { margin-bottom: 0.75em; border: 0; font-size: 1.15em; line-height: 1.5; }
+            .study-blurb__option { display: block; margin: 0.7em 0; font-size: 1.1em; font-weight: normal; }
+            .study-blurb__option input { margin-right: 0.5em; }
+            .study-blurb__actions { margin-top: 1.5em; text-align: center; }
+            .exit-message { max-width: 700px; margin: 10vh auto; padding: 15px; text-align: center; }
+            .exit-message p { margin-top: 1.5em; font-size: 1.3em; line-height: 1.5; }
+            [hidden] { display: none !important; }
+            @media (max-width: 600px) {
+                .study-blurb { padding: 10px; }
+                .study-blurb__heading { font-size: 1.6em; }
+                .study-blurb__body { font-size: 1em; }   
+			}
+        /* </script> */
+		</style>
+    </head>
+    <body>
+            <main id="study-blurb" class="study-blurb">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h1 class="panel-title study-blurb__heading">
+                        Teacher Judgements about Students’ Behaviors
+                        <span class="study-blurb__subtitle">Study Blurb</span>
+                    </h1>
+                </div>
+                <div class="panel-body study-blurb__body">
+                    <p><strong>Purpose:</strong> The purpose of this research study is to understand how students studying education make judgments about child learner traits.</p>
 
-    API.addQuestionsSet('basicMultiSelect',{
-        inherit: 'basicQ',
-        type: 'selectMulti',
-        autoSubmit: false,
-        errorMsg: {
-            required: 'Please select at least one answer before submitting.'
-        }
-    });
+                    <p><strong>Method:</strong> Individuals will complete a brief questionnaire over the internet using a platform called the Open Science Framework for us to find out if they are eligible for the study. Individuals who are eligible will be able to complete the online study.</p>
 
-    API.addQuestionsSet('demographicsMultiSelect',{
-        inherit: 'basicMultiSelect',
-        required: false
-    });
+                    <p><strong>Reimbursements:</strong> There are no costs for participating in the study. Eligible participants who complete all study procedures will be entered into a raffle to win a $20 Amazon gift. You will have a one in thirty chance of winning the raffle prize. If you win the raffle prize, you will receive a $20 Amazon gift card via email within one week of winning. The gift card will be emailed to the address you provide. If you do not complete all parts of the study, you will not be entered into the raffle and will not have a chance of being compensated.</p>
 
-			 /**
-	*Specific questions
-	*/	
+                    <p><strong>There is no payment for taking part in any other part of this study, including this screening.</strong></p>
 
-	//API.addQuestionsSet('age',{
-    //    inherit : 'basicText',
-    API.addQuestionsSet('educationStudent',{
-        inherit: 'demographicsSelect',
-        name: 'education_student',
-        stem: 'Are you currently a student studying education?',
-        answers: [
-            {text: 'Yes', value: 'yes'},
-            {text: 'No', value: 'no'}
-        ]
-    });
+                    <p>The first step in finding out if an individual may be eligible for the study is to ask you some questions concerning your background and current situation. The information you provide will be kept confidential and will not be released to anyone except personnel working on this study, and possibly the IRB.</p>
 
-    API.addQuestionsSet('studentLevel',{
-        inherit: 'demographicsSelect',
-        name: 'student_level',
-        stem: 'Are you an undergraduate or graduate student?',
-        answers: [
-            {text: 'Undergraduate', value: 'undergraduate'},
-            {text: 'Graduate', value: 'graduate'}
-        ]
-    });
-@@ -342,51 +174,51 @@ define(['questAPI'], function(Quest){
-        name: 'year_of_study',
-        stem: 'Please select your year of study.',
-        answers: [
-            {text: 'First Year', value: 'first_year'},
-            {text: 'Second Year', value: 'second_year'},
-            {text: 'Third Year', value: 'third_year'},
-            {text: 'Fourth Year', value: 'fourth_year'},
-            {text: 'Fifth Year', value: 'fifth_year'}
-        ]
-    });
+                    <form id="study-blurb-form">
+                        <fieldset>
+                            <legend>If this information seems satisfactory, are you willing to participate in the internet screen now?</legend>
+                            <label class="study-blurb__option"><input type="radio" name="screening_blurb_response" value="yes" required /> Yes</label>
+                            <label class="study-blurb__option"><input type="radio" name="screening_blurb_response" value="no" required /> No</label>
+                        </fieldset>
+                        <div class="study-blurb__actions">
+                            <button type="submit" class="btn btn-primary btn-lg">Continue</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
 
-    API.addQuestionsSet('studyState',{
-        inherit: 'demographicsSelect',
-        name: 'study_state',
-        stem: 'Please select the state in which you study.',
-        answers: [
-            {text: 'Connecticut', value: 'CT'},
-            {text: 'Maine', value: 'ME'},
-            {text: 'Massachusetts', value: 'MA'},
-            {text: 'New Hampshire', value: 'NH'},
-            {text: 'New Jersey', value: 'NJ'},
-            {text: 'New York', value: 'NY'},
-            {text: 'Pennsylvania', value: 'PA'},
-            {text: 'Rhode Island', value: 'RI'},
-            {text: 'Vermont', value: 'VT'},
-			{text: 'I study in a state that is not listed above (specify)', value: 'other'}
-        ]
-    });
+        <main id="exit-page" class="exit-message" hidden>
+            <div class="panel panel-info">
+                <div class="panel-heading"><h1 class="panel-title">Thank You</h1></div>
+                <div class="panel-body">
+                    <p>Thank you for your time and interest in this study. You may now close this browser window.</p>
+                </div>
+            </div>
+        </main>
 
-    API.addQuestionsSet('studyStateOther',{
-        inherit: 'demographicsText',
-        name: 'study_state_other',
-        required: false,
-        stem: 'Please enter the state in which you study.'
-    });
+        <script>
+            (function () {
+                var responseKey = 'screening_blurb_response';
+                var form = document.getElementById('study-blurb-form');
+                var blurb = document.getElementById('study-blurb');
+                var exitPage = document.getElementById('exit-page');
 
-    API.addQuestionsSet('dateOfBirth',{
-        inherit: 'demographicsText',
-        name: 'date_of_birth',
-        stem: 'Please enter your date of birth.',
-        inputType: 'date'
-    });
+                function showExitPage() {
+                    blurb.hidden = true;
+                    exitPage.hidden = false;
+                    document.title = 'Thank You';
+                }
 
-    API.addQuestionsSet('age',{
-        inherit: 'demographicsText',
-		name: 'age',
-    //    stem: 'What is your age?'
-	     stem: 'What is your age? (years)',
-        inputType: 'number',
-        min: 1,
-        max: 120,
-@@ -397,227 +229,110 @@ define(['questAPI'], function(Quest){
-            pattern: 'Please enter your age as a whole number.'
-        }
-    });
+                function launchStudy() {
+                    blurb.hidden = true;
+                    var scriptTag = document.createElement('script');
+                    scriptTag.src = 'https://cdn.jsdelivr.net/gh/minnojs/minno-quest@0.3/dist/pi-minno.js';
+                    scriptTag.onload = function () {
+                        var container = document.createElement('div');
+                        container.className = 'container';
+                        var canvas = document.createElement('div');
+                        container.appendChild(canvas);
+                        document.body.appendChild(container);
 
-     API.addQuestionsSet('sexAssignedAtBirth',{
-        inherit: 'demographicsSelect',
-        name: 'sex_assigned_at_birth',
-        stem: 'What is your sex assigned at birth?',
-        answers: [
-            {text: 'Male', value: 'male'},
-            {text: 'Female', value: 'female'},
-            {text: 'Intersex', value: 'intersex'}
-        ]
-    });
+                        minnoJS(canvas, 'mgr.js');
+                        minnoJS.onEnd = function () { setTimeout(proceed, 100); };
+                    };
+                    document.head.appendChild(scriptTag);
+                }
 
-    API.addQuestionsSet('genderIdentity',{
-        inherit: 'demographicsSelect',
-        name: 'gender_identity',
-        stem: 'What is your gender?',
-        answers: [
-            {text: 'Male', value: 'male'},
-            {text: 'Female', value: 'female'},
-            {text: 'Trans-male', value: 'trans_male'},
-            {text: 'Trans-female', value: 'trans_female'},
-            {text: 'Non-binary', value: 'non_binary'},
-			{text: 'Gender Identity not listed (specify)', value: 'other'}
-        ]
-    });
+                if (sessionStorage.getItem(responseKey) === 'no') {
+                    showExitPage();
+                    return;
+                }
 
-    API.addQuestionsSet('genderIdentityOther',{
-        inherit: 'demographicsText',
-        name: 'gender_identity_other',
-        required: false,
-        stem: 'Please enter your gender identity.'
-    });
-
-    API.addQuestionsSet('race',{
-        inherit: 'demographicsMultiSelect',
-        name: 'race',
-        stem: 'Please select your race. You may select more than one option.',
-        answers: [
-            {text: 'American Indian or Alaska Native', value: 'american_indian_alaska_native'},
-            {text: 'Asian', value: 'asian'},
-            {text: 'Black or African American', value: 'black_african_american'},
-            {text: 'Native Hawaiian or Other Pacific Islander', value: 'native_hawaiian_pacific_islander'},
-            {text: 'White', value: 'white'},
-			{text: 'Other (specify)', value: 'other'}
-        ]
-    });
-
-    API.addQuestionsSet('raceOther',{
-        inherit: 'demographicsText',
-        name: 'race_other',
-        required: false,
-        stem: 'Please enter your race.'
-    });
-
-    API.addQuestionsSet('ethnicity',{
-        inherit: 'demographicsSelect',
-        name: 'ethnicity',
-        stem: 'Please select your ethnicity.',
-        answers: [
-            {text: 'Hispanic/Latinx', value: 'hispanic_latinx'},
-            {text: 'Non-Hispanic/Latinx', value: 'non_hispanic_latinx'}
-        ]
-    });
-
-    API.addQuestionsSet('englishComprehension',{
-        inherit: 'demographicsSelect',
-        name: 'english_comprehension',
-        stem: 'Are you able to read and understand English?',
-        answers: [
-            {text: 'Yes', value: 'yes'},
-            {text: 'No', value: 'no'}
-        ]
-    });
-
-    API.addQuestionsSet('keyboardDevice',{
-        inherit: 'demographicsSelect',
-        name: 'keyboard_device',
-        stem: 'Are you able to complete this study on a personal device with a keyboard?',
-        answers: [
-            {text: 'Yes', value: 'yes'},
-            {text: 'No', value: 'no'}
-        ]
-	}); 
-			
-		API.addSequence([{
-        inherit: 'demographicsPage',
-        questions: [
-            {inherit: 'educationStudent'},
-            {inherit: 'studentLevel'},
-            {inherit: 'yearOfStudy'},
-            {inherit: 'studyState'},
-            {inherit: 'studyStateOther'},
-            {inherit: 'dateOfBirth'},
-            {inherit: 'age'},
-            {inherit: 'sexAssignedAtBirth'},
-            {inherit: 'genderIdentity'},
-            {inherit: 'genderIdentityOther'},
-            {inherit: 'race'},
-            {inherit: 'raceOther'},
-            {inherit: 'ethnicity'},
-            {inherit: 'englishComprehension'},
-            {inherit: 'keyboardDevice'}
-        ]
-    }]);
-
-    return API.script;
-});
-
-
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    var answer = form.elements[responseKey].value;
+                    sessionStorage.setItem(responseKey, answer);
+                    if (answer === 'yes') launchStudy();
+                    else showExitPage();
+                });
+            }());
+        </script>
+	</body>
+</html>
