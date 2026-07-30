@@ -1,8 +1,7 @@
 define(['questAPI'], function(Quest){
-    let API = new Quest();
-    let isTouch = API.getGlobal().$isTouch;
+    var API = new Quest();
 
-	// Quest renders the three free-text "Other" answers as separate questions.
+    // Quest renders the three free-text "Other" answers as separate questions.
     // Move only their existing input elements into the corresponding last option;
     // Quest still owns the inputs and their values.
     function placeOtherInputsInline(){
@@ -20,7 +19,7 @@ define(['questAPI'], function(Quest){
             document.head.appendChild(style);
         }
 
-		    function moveInput(input, expectedStem){
+        function moveInput(input, expectedStem){
             var inputQuestion = input.closest('li');
             if (!inputQuestion || inputQuestion.getAttribute('data-inline-other')) return;
             if (inputQuestion.textContent.indexOf(expectedStem) === -1) return;
@@ -44,27 +43,26 @@ define(['questAPI'], function(Quest){
             input.addEventListener('click', function(event){ event.stopPropagation(); });
         }
 
-		    function enhance(){
+        function enhance(){
             var stems = [
                 'Please enter the state in which you study.',
                 'Please enter your gender identity.',
                 'Please enter your race.'
             ];
-
             var inputs = document.querySelectorAll('[piq-page] input:not([type="hidden"]), [piq-page] textarea');
             Array.prototype.forEach.call(inputs, function(input){
                 stems.forEach(function(stem){ moveInput(input, stem); });
             });
         }
-        	var observer = new MutationObserver(enhance);
-        	observer.observe(document.body, {childList: true, subtree: true});
-        
-       		enhance();
-    	}
 
-	    placeOtherInputsInline();
+        var observer = new MutationObserver(enhance);
+        observer.observe(document.body, {childList: true, subtree: true});
+        enhance();
+    }
 
-		 /**
+    placeOtherInputsInline();
+
+    /**
 	* Page prototype
 	*/
     API.addPagesSet('basicPage',{
@@ -81,8 +79,8 @@ define(['questAPI'], function(Quest){
         inherit: 'basicPage',
         header: 'Demographics and Screening Form'
     });
-
-		/**
+	
+    /**
 	* Question prototypes
 	*/
     API.addQuestionsSet('basicQ',{
@@ -106,14 +104,25 @@ define(['questAPI'], function(Quest){
         type: 'selectOne'
     });
 	
-	API.addQuestionsSet('demographicsSelect',{
-@@ -268,71 +121,50 @@ define(['questAPI'], function(Quest){
+	    API.addQuestionsSet('demographicsSelect',{
+        inherit: 'basicSelect',
+        autoSubmit: false,
+        required: false
+    });
+
+    API.addQuestionsSet('basicDropdown',{
+        inherit :'basicQ',
+        type : 'dropdown',
+        autoSubmit:false
+    });
+
+	API.addQuestionsSet('basicText',{
         inherit :'basicQ',
         type : 'text',
         autoSubmit:false
     });
 
-	API.addQuestionsSet('demographicsText',{
+	    API.addQuestionsSet('demographicsText',{
         inherit: 'basicText',
         required: false
     });
@@ -131,14 +140,15 @@ define(['questAPI'], function(Quest){
         inherit: 'basicMultiSelect',
         required: false
     });
-
-			 /**
+	
+	
+    /**
 	*Specific questions
 	*/	
 
 	//API.addQuestionsSet('age',{
     //    inherit : 'basicText',
-    API.addQuestionsSet('educationStudent',{
+       API.addQuestionsSet('educationStudent',{
         inherit: 'demographicsSelect',
         name: 'education_student',
         stem: 'Are you currently a student studying education?',
@@ -157,7 +167,9 @@ define(['questAPI'], function(Quest){
             {text: 'Graduate', value: 'graduate'}
         ]
     });
-@@ -342,51 +174,51 @@ define(['questAPI'], function(Quest){
+
+    API.addQuestionsSet('yearOfStudy',{
+        inherit: 'demographicsSelect',
         name: 'year_of_study',
         stem: 'Please select your year of study.',
         answers: [
@@ -183,7 +195,7 @@ define(['questAPI'], function(Quest){
             {text: 'Pennsylvania', value: 'PA'},
             {text: 'Rhode Island', value: 'RI'},
             {text: 'Vermont', value: 'VT'},
-			{text: 'I study in a state that is not listed above (specify)', value: 'other'}
+            {text: 'I study in a state that is not listed above (specify)', value: 'other'}
         ]
     });
 
@@ -209,7 +221,10 @@ define(['questAPI'], function(Quest){
         inputType: 'number',
         min: 1,
         max: 120,
-@@ -397,227 +229,110 @@ define(['questAPI'], function(Quest){
+        step: 1,
+        pattern: '^[0-9]+$',
+        errorMsg: {
+            required: 'Please enter your age as a whole number.',
             pattern: 'Please enter your age as a whole number.'
         }
     });
@@ -225,7 +240,7 @@ define(['questAPI'], function(Quest){
         ]
     });
 
-    API.addQuestionsSet('genderIdentity',{
+         API.addQuestionsSet('genderIdentity',{
         inherit: 'demographicsSelect',
         name: 'gender_identity',
         stem: 'What is your gender?',
@@ -235,7 +250,7 @@ define(['questAPI'], function(Quest){
             {text: 'Trans-male', value: 'trans_male'},
             {text: 'Trans-female', value: 'trans_female'},
             {text: 'Non-binary', value: 'non_binary'},
-			{text: 'Gender Identity not listed (specify)', value: 'other'}
+            {text: 'Gender Identity not listed (specify)', value: 'other'}
         ]
     });
 
@@ -256,7 +271,7 @@ define(['questAPI'], function(Quest){
             {text: 'Black or African American', value: 'black_african_american'},
             {text: 'Native Hawaiian or Other Pacific Islander', value: 'native_hawaiian_pacific_islander'},
             {text: 'White', value: 'white'},
-			{text: 'Other (specify)', value: 'other'}
+            {text: 'Other (specify)', value: 'other'}
         ]
     });
 
@@ -296,8 +311,8 @@ define(['questAPI'], function(Quest){
             {text: 'No', value: 'no'}
         ]
 	}); 
-			
-		API.addSequence([{
+
+    API.addSequence([{
         inherit: 'demographicsPage',
         questions: [
             {inherit: 'educationStudent'},
